@@ -1,14 +1,17 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Item} from './Item';
 
 @Component({
   selector: 'action-button',
-  template: '<button (click)="onBtn()">TEST Btn</button>',
+  template: '<button (click)="onBtn()">{{value}}</button>',
 })
 export class ActionButtonComponent {
-  @Output() btnEvent = new EventEmitter<string>();
+  @Output() btnEvent = new EventEmitter<Item>();
+  @Input() value = "";
 
   onBtn() {
-    this.btnEvent.emit("hellooo");
+    const num = Math.random();
+    this.btnEvent.emit(new Item("Child" + num, "childpath", "Parent", "parentPath"));
   }
 }
 

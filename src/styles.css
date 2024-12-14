@@ -1,1 +1,392 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --spacing: 5px;
+  --2spacing: calc(2 * var(--spacing));
+  --scrollbar-width: 10px;
+  --menu-height: 30px;
+  --menu-color: hsl(0deg 0% 10%);
+  --checked-border-color: #03a9f4;
+  --checked-background-color: aliceblue;
+  --checked-hover-background-color: lightblue;
+  --unchecked-border-color: darkgray;
+  --unchecked-background-color: #f0f0f0;
+  --unchecked-hover-background-color: lightgray;
+}
+
+html, input, button, a {
+  font-family: system-ui;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes info-div-show {
+  from {
+    top: calc(-1 * var(--menu-height));
+  }
+  to {
+    top: 0;
+  }
+}
+
+#info-div {
+  position: fixed;
+  width: 100%;
+  height: var(--menu-height);
+  top: calc(-1 * var(--menu-height));
+  text-align: center;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.info-div-show {
+  animation-name: info-div-show;
+  animation-duration: 1s;
+  animation-timing-function: cubic-bezier(.22, 1.42, 0, .98);
+  animation-fill-mode: forwards;
+}
+
+.error {
+  background: darkred;
+  color: #ffc107;
+}
+
+.info {
+  background: #2196f3;
+  color: #e9f5ff;
+}
+
+.menu-div {
+  background: hsl(0deg 0% 80%);
+  border-bottom: 1px solid hsl(0deg 0% 64%);
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  color: var(--menu-color);
+  justify-content: space-between;
+  height: var(--menu-height);
+}
+
+.menu-div div {
+  display: flex;
+  align-items: center;
+}
+
+.menu-div a {
+  color: var(--menu-color);
+  font-size: 15px;
+  font-variant: all-small-caps;
+  text-decoration: none;
+  padding: 3px 10px 6px 10px;
+  cursor: pointer;
+}
+
+.menu-div a:first-child {
+  margin-left: 0;
+}
+
+.menu-div a:hover {
+  color: hsl(0deg 0% 95%);
+  background: grey;
+}
+
+#main-div {
+  display: flex;
+}
+
+#main-div > div {
+  padding: var(--2spacing);
+}
+
+#main-div > div:first-child {
+  padding-right: 0;
+}
+
+#library-div, #playlist-div {
+  box-sizing: border-box;
+  height: calc(100vh - var(--menu-height));
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+#playlist-table-div {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#current-song-div {
+  font-weight: bolder;
+  font-size: 20px;
+  margin-bottom: var(--spacing);
+}
+
+#progress-slider {
+  margin: var(--spacing);
+  width: 100%;
+}
+
+#progress-div {
+  display: flex;
+  align-items: center;
+  line-height: 30px;
+}
+
+h1 {
+  margin: 0 0 calc(3 * var(--spacing)) 0;
+  padding: 0;
+  font-variant: small-caps;
+}
+
+input[type="text"] {
+  padding: var(--spacing);
+  background: white;
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--unchecked-background-color);
+}
+
+button.checked {
+  cursor: pointer;
+  background-color: var(--checked-background-color);
+}
+
+button:hover {
+  background-color: var(--unchecked-hover-background-color) !important;
+}
+
+button.checked:hover {
+  background-color: var(--checked-hover-background-color) !important;
+}
+
+input[type="text"], button {
+  border: 1px solid var(--unchecked-border-color);
+  border-radius: 5px;
+}
+
+input[type="text"].checked, button.checked {
+  border: 1px solid var(--checked-border-color);
+  border-radius: 5px;
+}
+
+button.selected {
+  border: 1px solid #2196f3;
+}
+
+.playlist-controls-div button {
+  margin-right: var(--spacing);
+}
+
+.controls-div, .location-div, .playlist-controls-div {
+  padding: 0 0 var(--2spacing) 0;
+  display: flex;
+  align-items: center;
+}
+
+.controls-div button, .location-div * {
+  font-size: 18px;
+  margin-right: var(--spacing);
+}
+
+.controls-div button, .location-div button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+}
+
+#play-pause-btn, #prev-btn, #stop-btn, #next-btn, #loop-btn, #shuffle-btn {
+  background-image: url(/resources/icons.png);
+  background-size: 128px;
+}
+
+.pause-btn {
+  background-position: -1px -1px;
+}
+
+.play-btn {
+  background-position: calc(-2 * 16px - 1px) -1px;
+}
+
+#prev-btn {
+  background-position: -1px calc(-32px - 1px);
+}
+
+#stop-btn {
+  background-position: calc(-3 * 32px - 1px) -1px;
+}
+
+#next-btn {
+  background-position: calc(-32px - 1px) calc(-32px - 1px);
+}
+
+#loop-btn {
+  background-position: calc(-32px - 1px) calc(-3 * 32px - 1px);
+}
+
+#shuffle-btn {
+  background-position: calc(-1px) calc(-3 * 32px - 1px);
+}
+
+#volume-div {
+  display: flex;
+  align-items: flex-end;
+}
+
+#volume-slider {
+
+}
+
+.location-div {
+  font-style: italic;
+}
+
+.location-div span {
+  font-size: 16px;
+}
+
+.search-form {
+  margin-bottom: var(--2spacing);
+  display: flex;
+  align-items: center;
+}
+
+.search-form input {
+  width: 100%;
+  margin-left: var(--spacing);
+}
+
+.table-div {
+  border: 1px solid var(--unchecked-border-color);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.table-tr-selected {
+  background: var(--checked-border-color) !important;
+  color: white;
+}
+
+.table-head-tr-div {
+  background: #eee;
+  border-bottom: 1px solid var(--unchecked-border-color);
+  padding-right: var(--scrollbar-width);
+}
+
+.table-body-tr-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.table-head-td-div, .table-body-td-div {
+  border-left: 1px solid var(--unchecked-border-color);
+}
+
+.table-body-td-div {
+  height: 33px;
+  display: flex;
+  padding: var(--spacing);
+  box-sizing: border-box;
+  align-items: center;
+}
+
+.table-head-td-div:first-child, .table-body-td-div:first-child {
+  border-left: none;
+}
+
+.table-body-div {
+  overflow-y: scroll;
+}
+
+.table-body-div .table-body-tr-div {
+  border-top: 1px solid #ddd;
+}
+
+.table-body-tr-div:first-child {
+  border-top: none;
+}
+
+.table-body-tr-div:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.table-body-td-div, .table-head-td-div {
+  padding: var(--spacing);
+  box-sizing: border-box;
+  width: 50%;
+
+}
+
+.table-body-td-div {
+  display: flex;
+}
+
+.table-head-td-div {
+  display: inline-block;
+}
+
+.table-body-td-div, .table-body-td-div button {
+  font-size: 14px;
+}
+
+.table-body-td-div > button:last-child {
+  max-width: 50ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-body-td-div span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.table-control-btn {
+  width: 28px;
+}
+
+.table-body-td-div * {
+  margin-right: var(--spacing);
+}
+
+.control-buttons-div {
+  display: flex;
+  margin-right: 0;
+}
+
+.control-buttons-div button {
+  min-width: 28px;
+}
+
+.highlight {
+  background: yellow;
+}

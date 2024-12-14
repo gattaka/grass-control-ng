@@ -1,23 +1,23 @@
 import {Component} from '@angular/core';
-import {RouterOutlet} from '@angular/router';
 import {ActionButtonComponent} from './action-button.component';
 import {GridComponent} from './grid.component';
+import {Item} from './Item';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ActionButtonComponent, GridComponent],
+  imports: [ActionButtonComponent, GridComponent],
   template: `
     <div>
       Array size {{this.items.length}}
-      <action-button (btnEvent)="onBtn($event)"></action-button>
+      <action-button (btnEvent)="onBtn($event)" value="Add item"></action-button>
       <grid [items]="items"></grid>
     </div>`
 })
 export class AppComponent {
   title = 'angularTest';
-  items: string[] = new Array();
+  items: Item[] = new Array();
 
-  onBtn(item: string) {
+  onBtn(item: Item) {
     this.items.push(item);
   }
 }
