@@ -11,7 +11,7 @@ export class ActionButtonComponent {
 
   onBtn() {
     const num = Math.random();
-    this.btnEvent.emit(new Item("Child" + num, "childpath", "Parent", "parentPath"));
+    this.btnEvent.emit(new Item("Child" + num, "childpath", "Parent", "parentPath", []));
   }
 }
 
