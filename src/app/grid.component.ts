@@ -5,33 +5,28 @@ import {ActionButtonComponent} from './action-button.component';
 @Component({
   selector: 'grid',
   template: `
-    <div class="table-div" id="library-table">
-      <div class="table-head-div">
-        <div class="table-head-tr-div">
-          <div class="table-head-td-div" style="width:50%;">Název</div>
-          <div class="table-head-td-div" style="width:50%;">Nadřazený adresář</div>
-        </div>
+    <div class="table-head-div">
+      <div class="table-head-tr-div">
+        <div class="table-head-td-div">Název</div>
       </div>
-      <div class="table-body-div">
-        @for (item of items; track item.name) {
-          <div class="table-body-tr-div">
-            <div class="table-body-td-div" style="width:50%;">
-              <div class="control-buttons-div">
-                <action-button value="⏵"/>
-                <action-button value="+"/>
-              </div>
-              <action-button value="{{item.name}}"/>
+    </div>
+    <div class="table-body-div">
+      @for (item of items; track item.name) {
+        <div class="table-body-tr-div">
+          <div class="table-body-td-div">
+            <div class="control-buttons-div">
+              <action-button [item]=item label="⏵"/>
+              <action-button [item]=item label="+"/>
             </div>
-            <div class="table-body-td-div" style="width:50%;">
-              <div class="control-buttons-div">
-                <action-button value="⏵"/>
-                <action-button value="+"/>
-                <action-button value="{{item.parentName}}"/>
-              </div>
-            </div>
+            @if (item.directory) {
+              <action-button [item]=item label="{{item.name}}"/>
+            } @else {
+              <div>{{ item.name }}</div>
+            }
+            <div class="dir-info">{{ item.path }}</div>
           </div>
-        }
-      </div>
+        </div>
+      }
     </div>`,
   imports: [
     ActionButtonComponent

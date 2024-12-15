@@ -2,15 +2,11 @@ export class Item {
 
   name: string;
   path: string;
-  parentName: string;
-  parentPath: string;
-  children: Item[] = new Array();
+  directory: boolean;
 
-  constructor(name: string, path: string, parentName: string, parentPath: string, children: Item[]) {
+  constructor(name: string, path: string, directory: boolean) {
     this.name = name;
     this.path = path;
-    this.parentName = parentName;
-    this.parentPath = parentPath;
-    this.children = children;
+    this.directory = directory;
   }
 }

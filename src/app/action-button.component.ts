@@ -3,15 +3,15 @@ import {Item} from './Item';
 
 @Component({
   selector: 'action-button',
-  template: '<button (click)="onBtn()">{{value}}</button>',
+  template: '<button (click)="onBtn()">{{label}}</button>',
 })
 export class ActionButtonComponent {
   @Output() btnEvent = new EventEmitter<Item>();
-  @Input() value = "";
+  @Input() item!: Item;
+  @Input() label = "";
 
   onBtn() {
-    const num = Math.random();
-    this.btnEvent.emit(new Item("Child" + num, "childpath", "Parent", "parentPath", []));
+    this.btnEvent.emit(this.item);
   }
 }
 
