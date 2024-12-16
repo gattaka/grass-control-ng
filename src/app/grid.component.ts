@@ -19,11 +19,12 @@ import {ActionButtonComponent} from './action-button.component';
               <action-button [item]=item label="+"/>
               <action-button [item]=item (click)="openParentDir(item)" label="⮭"/>
             </div>
-            <div>
+            <div class="item-div">
               @if (item.directory) {
-                <action-button class="dir-button" [item]=item (click)="openDir(item)" label="{{item.name}}"/>
+<!--                <action-button class="dir-button" [item]=item (click)="openDir(item)" label="{{item.name}}"/>-->
+                <div class="name-div" (click)="openDir(item)">[{{ item.name }}]</div>
               } @else {
-                <div class="name-div">{{ item.name }}</div>
+                <div class="name-div" (click)="openCurrentDir(item)">{{ item.name }}</div>
               }
               <div class="dir-info">
                 @if (item.path == "") {
@@ -52,6 +53,10 @@ export class GridComponent {
     } else {
       this.onChangeDir.emit("");
     }
+  }
+
+  openCurrentDir(item:Item) {
+    this.onChangeDir.emit(item.path);
   }
 
   openDir(item: Item) {

@@ -78,7 +78,8 @@ export class AppComponent {
   }
 
   search() {
-    this.itemsObs = this.musicService.getItemsBySearch(this.searchForm.value.searchPhrase);
+    const value = this.searchForm.value.searchPhrase;
+    this.itemsObs = this.musicService.getItemsBySearch(value);
   }
 
   list(path = "") {

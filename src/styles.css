@@ -424,3 +424,8 @@ grid {
 .name-div {
   font-weight: 500;
 }
+
+.item-div:hover {
+  color: #2196f3;
+  cursor: pointer;
+}

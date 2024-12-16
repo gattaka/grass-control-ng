@@ -3,7 +3,6 @@ import {Item} from './Item';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Version} from './version';
-import {FormControl, ɵValue} from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +27,7 @@ export class MusicService {
     return this.http.get<Version>('/api/version');
   }
 
-  getItemsBySearch(searchPhrase: ɵValue<FormControl<string | null>> | undefined): Observable<Item[]> {
+  getItemsBySearch(searchPhrase: string | null | undefined): Observable<Item[]> {
     return this.http.get<Item[]>('/api/search?searchPhrase=' + searchPhrase);
   }
 }
