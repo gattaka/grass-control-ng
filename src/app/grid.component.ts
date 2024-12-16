@@ -17,12 +17,13 @@ import {ActionButtonComponent} from './action-button.component';
             <div class="control-buttons-div">
               <action-button [item]=item label="⏵"/>
               <action-button [item]=item label="+"/>
+              <action-button [item]=item (click)="openParentDir(item)" label="⮭"/>
             </div>
             <div>
               @if (item.directory) {
-                <action-button class="dir-button" [item]=item (click)="onItemBtn(item)" label="{{item.name}}"/>
+                <action-button class="dir-button" [item]=item (click)="openDir(item)" label="{{item.name}}"/>
               } @else {
-                <div>{{ item.name }}</div>
+                <div class="name-div">{{ item.name }}</div>
               }
               <div class="dir-info">
                 @if (item.path == "") {
@@ -43,7 +44,17 @@ export class GridComponent {
   @Input() items: Item[] = [];
   @Output() onChangeDir = new EventEmitter<string>();
 
-  onItemBtn(item: Item): void {
+  openParentDir(item: Item) {
+    const lastIndex = item.path.lastIndexOf("/");
+    console.log("item.path '" + item.path + "'");
+    if (lastIndex > -1) {
+      this.onChangeDir.emit(item.path.substring(0, lastIndex));
+    } else {
+      this.onChangeDir.emit("");
+    }
+  }
+
+  openDir(item: Item) {
     this.onChangeDir.emit(item.path + "/" + item.name);
   }
 }

@@ -5,10 +5,12 @@ import {MusicService} from './music.service';
 import {Observable} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {Version} from './version';
+import {ActionButtonComponent} from './action-button.component';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
-  imports: [ GridComponent, AsyncPipe],
+  imports: [GridComponent, AsyncPipe, FormsModule, ActionButtonComponent, ReactiveFormsModule],
   template: `
     <div class="menu-div">
       <div>
@@ -50,19 +52,13 @@ import {Version} from './version';
             <span id="volume-span">0%</span>
           </div>
         </div>
-        <form class="search-form" method="get" action="/">
-          <span>Vyhledat</span>
-          <input id="search-input" autocomplete="do-not-autofill" type="text" name="grass-control-search">
+        <form [formGroup]="searchForm" (ngSubmit)="search()">
+          <div id="search-div">
+            <input id="search-input" autocomplete="do-not-autofill" type="text" formControlName="searchPhrase"/>
+            <button type="submit">Vyhledat</button>
+          </div>
         </form>
-        <div class="location-div">
-          <button class="table-control-btn">⏵</button>
-          <button class="table-control-btn">+</button>
-          <button class="table-control-btn">⮭</button>
-          <span>Vypisuji výsledek adresáře "/2000s"</span>
-        </div>
-
         @if (itemsObs | async; as items) {
-          <!-- TODO pokud nepředávám string, jak předám hodnotu? $event je jenom string, ale EventEmitter má volnou parametrizaci :( -->
           <grid class="table-div" id="library-table" (onChangeDir)="list($event)" [items]="items"></grid>
         }
       </div>
@@ -74,10 +70,18 @@ export class AppComponent {
   itemsObs!: Observable<Item[]>;
   versionObs!: Observable<Version>;
 
+  searchForm = new FormGroup({
+    searchPhrase: new FormControl('')
+  });
+
   constructor(private musicService: MusicService) {
   }
 
-  list(path="") {
+  search() {
+    this.itemsObs = this.musicService.getItemsBySearch(this.searchForm.value.searchPhrase);
+  }
+
+  list(path = "") {
     this.itemsObs = this.musicService.getItems(path);
   }
 

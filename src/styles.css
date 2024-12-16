@@ -280,15 +280,14 @@ button.selected {
   font-size: 16px;
 }
 
-.search-form {
-  margin-bottom: var(--2spacing);
+#search-div {
   display: flex;
-  align-items: center;
+  margin-bottom: var(--2spacing);
+  gap: var(--2spacing);
 }
 
-.search-form input {
-  width: 100%;
-  margin-left: var(--spacing);
+#search-div input {
+  flex-grow: 1;
 }
 
 .table-div {
@@ -361,6 +360,7 @@ grid {
 
 .table-body-td-div {
   display: flex;
+  overflow: hidden;
 }
 
 .table-head-td-div {
@@ -386,8 +386,11 @@ grid {
   display: block;
 }
 
-.table-control-btn {
-  width: 28px;
+.table-control-btn button {
+  width: 32px;
+  line-height: 27px;
+  height: 32px;
+  font-size: 22px;
 }
 
 .table-body-td-div * {
@@ -416,4 +419,8 @@ grid {
 .dir-button button {
   font-size: 12px;
   line-height: 15px;
+}
+
+.name-div {
+  font-weight: 500;
 }
