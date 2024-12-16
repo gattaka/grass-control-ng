@@ -11,7 +11,15 @@ export class MusicService {
   constructor(private http: HttpClient) {
   }
 
-  getApiItems(): Observable<Item[]> {
+  reindex() {
+    this.http.get<Item[]>('/api/reindex');
+  }
+
+  getItems(path = ""): Observable<Item[]> {
+    return this.http.get<Item[]>('/api/list?path=' + path);
+  }
+
+  getRootItems(): Observable<Item[]> {
     return this.http.get<Item[]>('/api/list');
   }
 

@@ -35,12 +35,12 @@ import {Version} from './version';
           <span id="progress-length-span">00:00</span>
         </div>
         <div class="controls-div">
-          <input type="button" onclick="ajaxCall('pause')" id="play-pause-btn" class="play-btn">
-          <input onclick="ajaxCall('prev')" id="prev-btn" type="button">
-          <input onclick="ajaxCall('stop')" id="stop-btn" type="button">
-          <input onclick="ajaxCall('next')" id="next-btn" type="button">
-          <input onclick="ajaxCall('loop')" id="loop-btn" type="button">
-          <input onclick="ajaxCall('shuffle')" id="shuffle-btn" type="button">
+          <button id="play-pause-btn" class="play-btn"></button>
+          <button id="prev-btn"></button>
+          <button id="stop-btn"></button>
+          <button id="next-btn"></button>
+          <button id="loop-btn"></button>
+          <button id="shuffle-btn"></button>
           <div id="volume-div">
             <input onblur="elementsUnderChange['volume-slider']=false;"
                    onchange="ajaxCall('volume?value='+this.value);"
@@ -55,14 +55,15 @@ import {Version} from './version';
           <input id="search-input" autocomplete="do-not-autofill" type="text" name="grass-control-search">
         </form>
         <div class="location-div">
-          <input class="table-control-btn" value="⏵" onclick="ajaxCall('/addAndPlay?id=%2F2000s')" type="button">
-          <input class="table-control-btn" type="button" value="＋" onclick="ajaxCall('/add?id=%2F2000s')">
-          <input value="⮭" onclick="window.location.href='/?dir=%2F'" type="button">
+          <button class="table-control-btn">⏵</button>
+          <button class="table-control-btn">+</button>
+          <button class="table-control-btn">⮭</button>
           <span>Vypisuji výsledek adresáře "/2000s"</span>
         </div>
 
         @if (itemsObs | async; as items) {
-          <grid class="table-div" id="library-table" [items]="items"></grid>
+          <!-- TODO pokud nepředávám string, jak předám hodnotu? $event je jenom string, ale EventEmitter má volnou parametrizaci :( -->
+          <grid class="table-div" id="library-table" (onChangeDir)="list($event)" [items]="items"></grid>
         }
       </div>
     </div>`
@@ -76,12 +77,16 @@ export class AppComponent {
   constructor(private musicService: MusicService) {
   }
 
+  list(path="") {
+    this.itemsObs = this.musicService.getItems(path);
+  }
+
   onReindex() {
-    this.itemsObs = this.musicService.getApiItems();
+    this.musicService.reindex();
   }
 
   ngOnInit(): void {
-    this.itemsObs = this.musicService.getApiItems();
+    this.itemsObs = this.musicService.getRootItems();
     this.versionObs = this.musicService.getVersion();
   }
 }

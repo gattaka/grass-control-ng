@@ -231,7 +231,7 @@ button.selected {
 }
 
 #play-pause-btn, #prev-btn, #stop-btn, #next-btn, #loop-btn, #shuffle-btn {
-  background-image: url(/resources/icons.png);
+  background-image: url(/icons.png);
   background-size: 128px;
 }
 
@@ -321,11 +321,12 @@ button.selected {
 }
 
 .table-body-td-div {
-  height: 33px;
+  height: 40px;
   display: flex;
   padding: var(--spacing);
   box-sizing: border-box;
   align-items: center;
+  text-wrap-mode: nowrap;
 }
 
 .table-head-td-div:first-child, .table-body-td-div:first-child {
@@ -334,6 +335,11 @@ button.selected {
 
 .table-body-div {
   overflow-y: scroll;
+  height: 100%;
+}
+
+grid {
+  height: 100%;
 }
 
 .table-body-div .table-body-tr-div {
@@ -363,6 +369,7 @@ button.selected {
 
 .table-body-td-div, .table-body-td-div button {
   font-size: 14px;
+  line-height: 22px;
 }
 
 .table-body-td-div > button:last-child {
@@ -402,4 +409,11 @@ button.selected {
 
 .dir-info {
   color: grey;
+  font-size: 10px;
+  line-height: 12px;
+}
+
+.dir-button button {
+  font-size: 12px;
+  line-height: 15px;
 }

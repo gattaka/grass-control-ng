@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {Item} from './Item';
 import {ActionButtonComponent} from './action-button.component';
 
@@ -18,12 +18,19 @@ import {ActionButtonComponent} from './action-button.component';
               <action-button [item]=item label="⏵"/>
               <action-button [item]=item label="+"/>
             </div>
-            @if (item.directory) {
-              <action-button [item]=item label="{{item.name}}"/>
-            } @else {
-              <div>{{ item.name }}</div>
-            }
-            <div class="dir-info">{{ item.path }}</div>
+            <div>
+              @if (item.directory) {
+                <action-button class="dir-button" [item]=item (click)="onItemBtn(item)" label="{{item.name}}"/>
+              } @else {
+                <div>{{ item.name }}</div>
+              }
+              <div class="dir-info">
+                @if (item.path == "") {
+                  /
+                } @else {
+                  {{ item.path }}
+                }</div>
+            </div>
           </div>
         </div>
       }
@@ -33,7 +40,12 @@ import {ActionButtonComponent} from './action-button.component';
   ]
 })
 export class GridComponent {
-  @Input() items: Item[] = new Array();
+  @Input() items: Item[] = [];
+  @Output() onChangeDir = new EventEmitter<string>();
+
+  onItemBtn(item: Item): void {
+    this.onChangeDir.emit(item.path + "/" + item.name);
+  }
 }
 
 
