@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Item} from './Item';
+import {Item} from './item';
 import {ActionButtonComponent} from './action-button.component';
 
 @Component({

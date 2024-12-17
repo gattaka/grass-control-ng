@@ -1,16 +1,15 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GridComponent} from './grid.component';
-import {Item} from './Item';
+import {Item} from './item';
 import {MusicService} from './music.service';
-import {Observable} from 'rxjs';
+import {Observable, Subscription, switchMap, timer} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {Version} from './version';
-import {ActionButtonComponent} from './action-button.component';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-root',
-  imports: [GridComponent, AsyncPipe, FormsModule, ActionButtonComponent, ReactiveFormsModule],
+  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule],
   template: `
     <div id="menu-div">
       <div>
@@ -26,15 +25,21 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
 
     <div id="main-div">
       <div id="library-div">
-        <div id="current-song-div">-</div>
+        <div id="current-song-div">
+          <div id="current-song-artist">{{ currentSongArtist }}</div>
+          -
+          <div id="current-song-title">{{ currentSongTitle }}</div>
+          <div id="current-song-file">{{ currentSongFile }}</div>
+        </div>
         <div id="progress-div">
-          <span id="progress-time-span">00:00</span>
+          <span id="progress-time-span">{{ positionTime }}</span>
           <input type="range" id="progress-slider" onmousedown="elementsUnderChange['progress-slider']=true;"
                  onmouseup="elementsUnderChange['progress-slider']=false;"
                  onblur="elementsUnderChange['progress-slider']=false;"
                  onchange="ajaxCall('progress?value='+this.value);"
-                 onwheel="progressControlScroll(event, val => {ajaxCall('progress?value='+val)});" min="0" max="0">
-          <span id="progress-length-span">00:00</span>
+                 onwheel="progressControlScroll(event, val => {ajaxCall('progress?value='+val)});" min="0"
+                 max="{{totalSecs}}" value="{{ currentSecs }}"/>
+          <span id="progress-length-span">{{ lengthTime }}</span>
         </div>
         <div class="controls-div">
           <button id="play-pause-btn" class="play-btn" (click)="onPlayPause()"></button>
@@ -64,19 +69,58 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
       </div>
     </div>`
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'angularTest';
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
   itemsObs!: Observable<Item[]>;
   versionObs!: Observable<Version>;
 
+  currentSongFile = "";
+  currentSongArtist = "";
+  currentSongTitle = "";
+
+  positionTime = "";
+  lengthTime = "";
+
+  totalSecs = 0;
+  currentSecs = 0;
+
+  subscription !: Subscription;
+
   searchForm = new FormGroup({
     searchPhrase: new FormControl('')
   });
 
+  formatTime(timeInSec: number): string {
+    let minutes = Math.floor(timeInSec / 60);
+    return (minutes < 10 ? "0" : "") + minutes + ":" + (timeInSec % 60);
+  }
+
   ngOnInit(): void {
     this.itemsObs = this.musicService.getRootItems();
     this.versionObs = this.musicService.getVersion();
+
+    this.subscription = timer(0, 5000).pipe(
+      switchMap(() => this.musicService.getStatus())
+    ).subscribe(result => {
+        let info = result["information"];
+        let meta = info["category"]["meta"];
+        this.currentSongArtist = meta["artist"];
+        this.currentSongTitle = meta["title"];
+        this.currentSongFile = meta["filename"];
+
+        this.totalSecs = result["length"];
+        this.currentSecs = result["time"];
+        this.positionTime = this.formatTime(this.currentSecs);
+        this.lengthTime = this.formatTime(this.totalSecs);
+
+        console.log(this.currentSecs);
+      }
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   constructor(private musicService: MusicService) {

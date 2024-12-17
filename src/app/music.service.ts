@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Item} from './Item';
+import {Item} from './item';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Version} from './version';
@@ -63,4 +63,7 @@ export class MusicService {
     return this.http.get<Item[]>('/api/search?searchPhrase=' + searchPhrase);
   }
 
+  getStatus() {
+    return this.http.get<any>('/api/status');
+  }
 }

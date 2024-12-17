@@ -161,6 +161,19 @@ body {
   margin-bottom: var(--spacing);
 }
 
+#current-song-artist {
+  display: inline;
+}
+
+#current-song-title {
+  display: inline;
+}
+
+#current-song-file {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 #progress-slider {
   margin: var(--spacing);
   width: 100%;
