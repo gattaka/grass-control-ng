@@ -37,12 +37,12 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
           <span id="progress-length-span">00:00</span>
         </div>
         <div class="controls-div">
-          <button id="play-pause-btn" class="play-btn"></button>
-          <button id="prev-btn"></button>
-          <button id="stop-btn"></button>
-          <button id="next-btn"></button>
-          <button id="loop-btn"></button>
-          <button id="shuffle-btn"></button>
+          <button id="play-pause-btn" class="play-btn" (click)="onPlayPause()"></button>
+          <button id="prev-btn" (click)="onPrevious()"></button>
+          <button id="stop-btn" (click)="onStop()"></button>
+          <button id="next-btn" (click)="onNext()"></button>
+          <button id="loop-btn" (click)="onLoop()"></button>
+          <button id="shuffle-btn" (click)="onRandom()"></button>
           <div id="volume-div">
             <input onblur="elementsUnderChange['volume-slider']=false;"
                    onchange="ajaxCall('volume?value='+this.value);"
@@ -74,6 +74,11 @@ export class AppComponent {
     searchPhrase: new FormControl('')
   });
 
+  ngOnInit(): void {
+    this.itemsObs = this.musicService.getRootItems();
+    this.versionObs = this.musicService.getVersion();
+  }
+
   constructor(private musicService: MusicService) {
   }
 
@@ -90,8 +95,27 @@ export class AppComponent {
     this.musicService.reindex();
   }
 
-  ngOnInit(): void {
-    this.itemsObs = this.musicService.getRootItems();
-    this.versionObs = this.musicService.getVersion();
+  onPlayPause() {
+    this.musicService.play();
+  }
+
+  onStop() {
+    this.musicService.stop();
+  }
+
+  onPrevious() {
+    this.musicService.previous();
+  }
+
+  onNext() {
+    this.musicService.next();
+  }
+
+  onLoop() {
+    this.musicService.loop();
+  }
+
+  onRandom() {
+    this.musicService.random();
   }
 }
