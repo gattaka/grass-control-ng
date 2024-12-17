@@ -46,15 +46,15 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
           <button id="prev-btn" (click)="onPrevious()"></button>
           <button id="stop-btn" (click)="onStop()"></button>
           <button id="next-btn" (click)="onNext()"></button>
-          <button id="loop-btn" (click)="onLoop()"></button>
-          <button id="shuffle-btn" (click)="onRandom()"></button>
+          <button id="loop-btn" (click)="onLoop()" class="{{loop ? 'checked' : ''}}"></button>
+          <button id="shuffle-btn" (click)="onRandom()" class="{{random ? 'checked' : ''}}"></button>
           <div id="volume-div">
             <input onblur="elementsUnderChange['volume-slider']=false;"
                    onchange="ajaxCall('volume?value='+this.value);"
                    onwheel="volumeControlScroll(event, val => {ajaxCall('volume?value='+val)});" type="range"
-                   id="volume-slider" max="320" onmousedown="elementsUnderChange['volume-slider']=true;"
-                   onmouseup="elementsUnderChange['volume-slider']=false;" min="0">
-            <span id="volume-span">0%</span>
+                   id="volume-slider" max="256" onmousedown="elementsUnderChange['volume-slider']=true;"
+                   onmouseup="elementsUnderChange['volume-slider']=false;" min="0" value="{{volume}}">
+            <span id="volume-span">{{ volumePerc }}%</span>
           </div>
         </div>
         <form [formGroup]="searchForm" (ngSubmit)="search()">
@@ -64,7 +64,8 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
           </div>
         </form>
         @if (itemsObs | async; as items) {
-          <grid class="table-div" id="library-table" (onChangeDir)="list($event)" [items]="items"></grid>
+          <grid class="table-div" id="library-table" (onChangeDir)="list($event)" (onEnque)="enqueue($event)"
+                (onEnqueAndPlay)="enqueueAndPlay($event)" [items]="items"></grid>
         }
       </div>
     </div>`
@@ -85,6 +86,12 @@ export class AppComponent implements OnInit, OnDestroy {
   totalSecs = 0;
   currentSecs = 0;
 
+  random = false;
+  loop = false;
+
+  volume = 0;
+  volumePerc = 0;
+
   subscription !: Subscription;
 
   searchForm = new FormGroup({
@@ -93,14 +100,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   formatTime(timeInSec: number): string {
     let minutes = Math.floor(timeInSec / 60);
-    return (minutes < 10 ? "0" : "") + minutes + ":" + (timeInSec % 60);
+    let seconds = timeInSec % 60;
+    return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
   }
 
   ngOnInit(): void {
     this.itemsObs = this.musicService.getRootItems();
     this.versionObs = this.musicService.getVersion();
 
-    this.subscription = timer(0, 5000).pipe(
+    this.subscription = timer(0, 500).pipe(
+      // TODO tady by to chtělo vyřešit handle chyb (err 404, 500 apod.), jinak se to celé zasekne
       switchMap(() => this.musicService.getStatus())
     ).subscribe(result => {
         let info = result["information"];
@@ -114,7 +123,11 @@ export class AppComponent implements OnInit, OnDestroy {
         this.positionTime = this.formatTime(this.currentSecs);
         this.lengthTime = this.formatTime(this.totalSecs);
 
-        console.log(this.currentSecs);
+        this.volume = result["volume"];
+        this.volumePerc = Math.floor(this.volume / 256 * 100);
+
+        this.random = result["random"];
+        this.loop = result["loop"];
       }
     );
   }
@@ -129,6 +142,14 @@ export class AppComponent implements OnInit, OnDestroy {
   search() {
     const value = this.searchForm.value.searchPhrase;
     this.itemsObs = this.musicService.getItemsBySearch(value);
+  }
+
+  enqueue(path = "") {
+    this.musicService.enqueue(path);
+  }
+
+  enqueueAndPlay(path = "") {
+    this.musicService.enqueueAndPlay(path);
   }
 
   list(path = "") {

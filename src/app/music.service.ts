@@ -66,4 +66,12 @@ export class MusicService {
   getStatus() {
     return this.http.get<any>('/api/status');
   }
+
+  enqueue(path: string) {
+    this.http.get('/api/enqueue?path=' + path).subscribe();
+  }
+
+  enqueueAndPlay(path: string) {
+    this.http.get('/api/enqueue-and-play?path=' + path).subscribe();
+  }
 }

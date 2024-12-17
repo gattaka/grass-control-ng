@@ -15,18 +15,16 @@ import {ActionButtonComponent} from './action-button.component';
         <div class="table-body-tr-div">
           <div class="table-body-td-div">
             <div class="control-buttons-div">
-              <action-button [item]=item label="⏵"/>
               <action-button [item]=item label="+"/>
               <action-button [item]=item (click)="openParentDir(item)" label="⮭"/>
             </div>
             <div class="item-div">
               @if (item.directory) {
-<!--                <action-button class="dir-button" [item]=item (click)="openDir(item)" label="{{item.name}}"/>-->
                 <div class="name-div" (click)="openDir(item)">[{{ item.name }}]</div>
               } @else {
-                <div class="name-div" (click)="openCurrentDir(item)">{{ item.name }}</div>
+                <div class="name-div" (click)="enqueAndPlay(item)">{{ item.name }}</div>
               }
-              <div class="dir-info">
+              <div class="dir-info" (click)="openCurrentDir(item)">
                 @if (item.path == "") {
                   /
                 } @else {
@@ -44,6 +42,8 @@ import {ActionButtonComponent} from './action-button.component';
 export class GridComponent {
   @Input() items: Item[] = [];
   @Output() onChangeDir = new EventEmitter<string>();
+  @Output() onEnqueAndPlay = new EventEmitter<string>();
+  @Output() onEnque = new EventEmitter<string>();
 
   openParentDir(item: Item) {
     const lastIndex = item.path.lastIndexOf("/");
@@ -55,12 +55,20 @@ export class GridComponent {
     }
   }
 
-  openCurrentDir(item:Item) {
+  openCurrentDir(item: Item) {
     this.onChangeDir.emit(item.path);
   }
 
   openDir(item: Item) {
     this.onChangeDir.emit(item.path + "/" + item.name);
+  }
+
+  enque(item: Item) {
+    this.onEnque.emit(item.path + "/" + item.name);
+  }
+
+  enqueAndPlay(item: Item) {
+    this.onEnqueAndPlay.emit(item.path + "/" + item.name);
   }
 }
 

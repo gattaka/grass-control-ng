@@ -445,7 +445,7 @@ grid {
   font-weight: 500;
 }
 
-.item-div:hover {
+.name-div:hover, .dir-info:hover {
   color: #2196f3;
   cursor: pointer;
 }
