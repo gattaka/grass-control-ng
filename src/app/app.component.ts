@@ -12,7 +12,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
   selector: 'app-root',
   imports: [GridComponent, AsyncPipe, FormsModule, ActionButtonComponent, ReactiveFormsModule],
   template: `
-    <div class="menu-div">
+    <div id="menu-div">
       <div>
         <a href="/">GrassControl</a>
         <div class="menu-button" (click)="onReindex()">Reindex</div>

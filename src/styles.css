@@ -3,6 +3,7 @@
   --2spacing: calc(2 * var(--spacing));
   --scrollbar-width: 10px;
   --menu-height: 30px;
+  --menu-border-height: 6px;
   --menu-color: #040404;
   --checked-border-color: #03a9f4;
   --checked-background-color: aliceblue;
@@ -57,24 +58,30 @@ body {
   color: #e9f5ff;
 }
 
-.menu-div {
-  background: #6092ff;
-  background: linear-gradient(0deg, #3374ff36 0%, #6092ff6b 100%);
-  border-bottom: 1px solid #3374ff21;
+#top-border-div {
+  height: 4px;
+  background: #6ba6ff;
+}
+
+#menu-div {
+  background: linear-gradient(0deg, #e5edff 0%, #c6d8ff 100%);
   display: flex;
   flex-direction: row;
-  box-sizing: border-box;
   color: var(--menu-color);
   justify-content: space-between;
   height: var(--menu-height);
+  box-shadow: 0 0px 10px -6px #003b77;
+  border-bottom: 1px solid #aacdf1;
+  box-sizing: content-box;
+  border-top: 5px solid #71b7ff;
 }
 
-.menu-div div {
+#menu-div div {
   display: flex;
   align-items: center;
 }
 
-.menu-div div * {
+#menu-div div * {
   padding: 3px 10px 6px 10px;
   border: none;
   background: none;
@@ -89,16 +96,16 @@ body {
   align-items: center;
 }
 
-.menu-div a, .menu-div .menu-button {
+#menu-div a, #menu-div .menu-button {
   cursor: pointer;
 }
 
-.menu-div a:first-child {
+#menu-div a:first-child {
   margin-left: 0;
 }
 
-.menu-div a:hover, .menu-div .menu-button:hover {
-  background: #8cb0ff;
+#menu-div a:hover, #menu-div .menu-button:hover {
+  background: #6ba6ff;
   color: #ffffff;
 }
 
@@ -116,7 +123,7 @@ body {
 
 #library-div, #playlist-div {
   box-sizing: border-box;
-  height: calc(100vh - var(--menu-height));
+  height: calc(100vh - var(--menu-height) - var(--menu-border-height));
   display: flex;
   flex-direction: column;
   width: 50%;
