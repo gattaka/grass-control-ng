@@ -74,4 +74,8 @@ export class MusicService {
   enqueueAndPlay(path: string) {
     this.http.get('/api/enqueue-and-play?path=' + path).subscribe();
   }
+
+  getPlaylist() {
+    return this.http.get<any>('/api/playlist');
+  }
 }

@@ -6,6 +6,7 @@ import {Observable, Subscription, switchMap, timer} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
 import {Version} from './version';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {PlaylistItem} from './playlist.item';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,7 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
     </div>
 
     <div id="main-div">
+
       <div id="library-div">
         <div id="current-song-div">
           <div id="current-song-artist">{{ currentSongArtist }}</div>
@@ -42,8 +44,8 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
           <span id="progress-length-span">{{ lengthTime }}</span>
         </div>
         <div class="controls-div">
-          <!--          TODO pauza CSS a příkaz-->
-          <button id="play-pause-btn" class="{{isPlaying() ? 'pause-btn' : 'play-btn'}}" (click)="onPlayPause()"></button>
+          <button id="play-pause-btn" class="{{isPlaying() ? 'pause-btn' : 'play-btn'}}"
+                  (click)="onPlayPause()"></button>
           <button id="prev-btn" (click)="onPrevious()"></button>
           <button id="stop-btn" (click)="onStop()"></button>
           <button id="next-btn" (click)="onNext()"></button>
@@ -69,6 +71,44 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
                 (onEnqueAndPlay)="enqueueAndPlay($event)" [items]="items"></grid>
         }
       </div>
+
+      <div id="playlist-div">
+        <form [formGroup]="searchPlaylistForm" (ngSubmit)="searchPlaylist()">
+          <div id="search-div">
+            <input id="search-playlist-input" autocomplete="do-not-autofill" type="text"
+                   formControlName="searchPhrase"/>
+            <button type="submit">Vyhledat</button>
+          </div>
+        </form>
+        <div class="playlist-controls-div">
+          <button onclick="ajaxCall('clear')">Vyčistit</button>
+          <button onclick="ajaxCall('clearExceptPlaying')">Nechat jet hrající</button>
+        </div>
+        <div id="playlist-table-div">
+          <div class="table-div" id="playlist-table">
+            <div class="table-head-div">
+              <div class="table-head-tr-div">
+                <div class="table-head-td-div" style="width:80%;">Název</div>
+                <div class="table-head-td-div" style="width:20%;">Délka</div>
+              </div>
+            </div>
+            <div class="table-body-div">
+              @for (item of playlistItems; track item.name) {
+                <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
+                  <div class="table-body-td-div" style="width:80%;">
+                    <div class="control-buttons-div">
+                      <button class="table-control-btn" onclick="ajaxCall('/remove?id=3')">✖</button>
+                      <button class="table-control-btn" onclick="ajaxCall('/play?id=3')">⏵</button>
+                    </div>
+                    <span class="playlist-item">{{ item.name }}</span></div>
+                  <div class="table-body-td-div" style="width:20%;">{{ formatTime(item.length) }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>`
 })
 export class AppComponent implements OnInit, OnDestroy {
@@ -80,6 +120,7 @@ export class AppComponent implements OnInit, OnDestroy {
   currentSongFile = "";
   currentSongArtist = "";
   currentSongTitle = "";
+  currentSongId = 0;
 
   positionTime = "";
   lengthTime = "";
@@ -95,9 +136,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   state = "";
 
-  subscription !: Subscription;
+  statusSubscription !: Subscription;
+  playlistSubscription !: Subscription;
+
+  playlistItems = new Array<PlaylistItem>;
 
   searchForm = new FormGroup({
+    searchPhrase: new FormControl('')
+  });
+
+  searchPlaylistPhrase: string | undefined;
+  searchPlaylistForm = new FormGroup({
     searchPhrase: new FormControl('')
   });
 
@@ -111,7 +160,31 @@ export class AppComponent implements OnInit, OnDestroy {
     this.itemsObs = this.musicService.getRootItems();
     this.versionObs = this.musicService.getVersion();
 
-    this.subscription = timer(0, 500).pipe(
+    this.playlistSubscription = timer(0, 500).pipe(
+      // TODO tady by to chtělo vyřešit handle chyb (err 404, 500 apod.), jinak se to celé zasekne
+      switchMap(() => this.musicService.getPlaylist())
+    ).subscribe(result => {
+      this.playlistItems = new Array<PlaylistItem>;
+      if (result) {
+        const playlist = result["children"][0];
+        if (playlist) {
+          const songs = playlist["children"];
+          for (let i = 0; i < songs.length; i++) {
+            const song = songs[i];
+            const item = new PlaylistItem(song["name"], song["uri"], song["duration"], song["id"]);
+            if (this.searchPlaylistPhrase) {
+              if (item.name.toLowerCase().includes(this.searchPlaylistPhrase) || item.uri.toLowerCase().includes(this.searchPlaylistPhrase)) {
+                this.playlistItems.push(item);
+              }
+            } else {
+              this.playlistItems.push(item);
+            }
+          }
+        }
+      }
+    });
+
+    this.statusSubscription = timer(0, 500).pipe(
       // TODO tady by to chtělo vyřešit handle chyb (err 404, 500 apod.), jinak se to celé zasekne
       switchMap(() => this.musicService.getStatus())
     ).subscribe(result => {
@@ -124,6 +197,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.currentSongFile = meta["filename"];
         }
 
+        this.currentSongId = result["currentplid"];
         this.totalSecs = result["length"];
         this.currentSecs = result["time"];
         this.positionTime = this.formatTime(this.currentSecs);
@@ -141,7 +215,8 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.statusSubscription.unsubscribe();
+    this.playlistSubscription.unsubscribe();
   }
 
   constructor(private musicService: MusicService) {
@@ -150,6 +225,10 @@ export class AppComponent implements OnInit, OnDestroy {
   search() {
     const value = this.searchForm.value.searchPhrase;
     this.itemsObs = this.musicService.getItemsBySearch(value);
+  }
+
+  searchPlaylist() {
+    this.searchPlaylistPhrase = this.searchPlaylistForm.value.searchPhrase?.toLowerCase();
   }
 
   enqueue(path = "") {
