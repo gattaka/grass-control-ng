@@ -78,4 +78,17 @@ export class MusicService {
   getPlaylist() {
     return this.http.get<any>('/api/playlist');
   }
+
+  playFromPlaylist(id: number) {
+    this.http.get('/api/playFromPlaylist?id=' + id).subscribe();
+  }
+
+  removeFromPlaylist(id: number) {
+    this.http.get('/api/removeFromPlaylist?id=' + id).subscribe();
+  }
+
+  emptyPlaylist() {
+    this.http.get('/api/emptyPlaylist').subscribe();
+  }
+
 }

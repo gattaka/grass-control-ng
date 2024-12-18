@@ -329,7 +329,7 @@ button.selected {
   padding-right: var(--scrollbar-width);
 }
 
-.table-body-tr-div {
+.table-body-tr-div, .table-head-tr-div {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -448,4 +448,40 @@ grid {
 .name-div:hover, .dir-info:hover {
   color: #2196f3;
   cursor: pointer;
+}
+
+.playlist-name-div {
+  width: 100%;
+}
+
+.playlist-length-div {
+  width: 60px;
+  display: flex;
+  justify-content: center;
+}
+
+.table-tr-selected .item-div .dir-info {
+  color: white;
+}
+
+.table-tr-selected .item-div .name-div:hover {
+  color: white;
+}
+
+#playlist-table .name-div:hover {
+  color: black;
+  cursor: initial;
+}
+
+#playlist-table .table-tr-selected .name-div {
+  color: white;
+}
+
+#playlist-table .table-tr-selected .dir-info, #playlist-table .table-tr-selected .dir-info:hover {
+  color: white;
+}
+
+#playlist-table .dir-info:hover {
+  color: grey;
+  cursor: initial;
 }

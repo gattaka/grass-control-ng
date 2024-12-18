@@ -81,27 +81,31 @@ import {PlaylistItem} from './playlist.item';
           </div>
         </form>
         <div class="playlist-controls-div">
-          <button onclick="ajaxCall('clear')">Vyčistit</button>
+          <button (click)="emptyPlaylist()">Vyčistit</button>
           <button onclick="ajaxCall('clearExceptPlaying')">Nechat jet hrající</button>
         </div>
         <div id="playlist-table-div">
           <div class="table-div" id="playlist-table">
             <div class="table-head-div">
               <div class="table-head-tr-div">
-                <div class="table-head-td-div" style="width:80%;">Název</div>
-                <div class="table-head-td-div" style="width:20%;">Délka</div>
+                <div class="table-head-td-div playlist-name-div">Název</div>
+                <div class="table-head-td-div playlist-length-div">Délka</div>
               </div>
             </div>
             <div class="table-body-div">
               @for (item of playlistItems; track item.name) {
                 <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
-                  <div class="table-body-td-div" style="width:80%;">
+                  <div class="table-body-td-div playlist-name-div">
                     <div class="control-buttons-div">
-                      <button class="table-control-btn" onclick="ajaxCall('/remove?id=3')">✖</button>
-                      <button class="table-control-btn" onclick="ajaxCall('/play?id=3')">⏵</button>
+                      <button class="table-control-btn" (click)="removeFromPlaylist(item.id)">✖</button>
+                      <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
                     </div>
-                    <span class="playlist-item">{{ item.name }}</span></div>
-                  <div class="table-body-td-div" style="width:20%;">{{ formatTime(item.length) }}</div>
+                    <div class="item-div">
+                      <div class="name-div">{{ item.name }}</div>
+                      <div class="dir-info">{{ item.uri }}</div>
+                    </div>
+                  </div>
+                  <div class="table-body-td-div playlist-length-div">{{ formatTime(item.length) }}</div>
                 </div>
               }
             </div>
@@ -277,5 +281,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onRandom() {
     this.musicService.random();
+  }
+
+  playFromPlaylist(id: number) {
+    this.musicService.playFromPlaylist(id);
+  }
+
+  removeFromPlaylist(id: number) {
+    this.musicService.removeFromPlaylist(id);
+  }
+
+  emptyPlaylist() {
+    this.musicService.emptyPlaylist();
   }
 }
