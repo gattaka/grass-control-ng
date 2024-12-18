@@ -420,6 +420,7 @@ grid {
 .control-buttons-div {
   display: flex;
   margin-right: 0;
+  margin-left: var(--spacing);
 }
 
 .control-buttons-div button {
@@ -458,6 +459,10 @@ grid {
   width: 60px;
   display: flex;
   justify-content: center;
+}
+
+.item-div {
+  margin-bottom: 5px;
 }
 
 .table-tr-selected .item-div .dir-info {

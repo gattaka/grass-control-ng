@@ -97,8 +97,12 @@ import {PlaylistItem} from './playlist.item';
                 <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
                   <div class="table-body-td-div playlist-name-div">
                     <div class="control-buttons-div">
-                      <button class="table-control-btn" (click)="removeFromPlaylist(item.id)">✖</button>
-                      <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
+                      <div>
+                        <button class="table-control-btn" (click)="removeFromPlaylist(item.id)">✖</button>
+                      </div>
+                      <div>
+                        <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
+                      </div>
                     </div>
                     <div class="item-div">
                       <div class="name-div">{{ item.name }}</div>
@@ -155,6 +159,7 @@ export class AppComponent implements OnInit, OnDestroy {
   });
 
   formatTime(timeInSec: number): string {
+    if (timeInSec == -1) return "n/a";
     let minutes = Math.floor(timeInSec / 60);
     let seconds = timeInSec % 60;
     return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
