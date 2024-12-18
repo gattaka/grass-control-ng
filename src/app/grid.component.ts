@@ -15,7 +15,8 @@ import {ActionButtonComponent} from './action-button.component';
         <div class="table-body-tr-div">
           <div class="table-body-td-div">
             <div class="control-buttons-div">
-              <action-button [item]=item label="+"/>
+              <action-button [item]=item label="⏵" (click)="enqueAndPlay(item)"/>
+              <action-button [item]=item label="+" (click)="enque(item)"/>
               <action-button [item]=item (click)="openParentDir(item)" label="⮭"/>
             </div>
             <div class="item-div">

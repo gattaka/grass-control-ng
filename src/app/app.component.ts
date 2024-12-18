@@ -42,7 +42,8 @@ import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular
           <span id="progress-length-span">{{ lengthTime }}</span>
         </div>
         <div class="controls-div">
-          <button id="play-pause-btn" class="play-btn" (click)="onPlayPause()"></button>
+          <!--          TODO pauza CSS a příkaz-->
+          <button id="play-pause-btn" class="{{isPlaying() ? 'pause-btn' : 'play-btn'}}" (click)="onPlayPause()"></button>
           <button id="prev-btn" (click)="onPrevious()"></button>
           <button id="stop-btn" (click)="onStop()"></button>
           <button id="next-btn" (click)="onNext()"></button>
@@ -92,6 +93,8 @@ export class AppComponent implements OnInit, OnDestroy {
   volume = 0;
   volumePerc = 0;
 
+  state = "";
+
   subscription !: Subscription;
 
   searchForm = new FormGroup({
@@ -113,10 +116,13 @@ export class AppComponent implements OnInit, OnDestroy {
       switchMap(() => this.musicService.getStatus())
     ).subscribe(result => {
         let info = result["information"];
-        let meta = info["category"]["meta"];
-        this.currentSongArtist = meta["artist"];
-        this.currentSongTitle = meta["title"];
-        this.currentSongFile = meta["filename"];
+
+        if (info) {
+          let meta = info["category"]["meta"];
+          this.currentSongArtist = meta["artist"];
+          this.currentSongTitle = meta["title"];
+          this.currentSongFile = meta["filename"];
+        }
 
         this.totalSecs = result["length"];
         this.currentSecs = result["time"];
@@ -128,6 +134,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
         this.random = result["random"];
         this.loop = result["loop"];
+
+        this.state = result["state"];
       }
     );
   }
@@ -160,8 +168,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.musicService.reindex();
   }
 
+  isPlaying() {
+    return this.state == "playing";
+  }
+
   onPlayPause() {
-    this.musicService.play();
+    if (this.isPlaying()) {
+      this.musicService.pause();
+    } else {
+      this.musicService.play();
+    }
   }
 
   onStop() {
