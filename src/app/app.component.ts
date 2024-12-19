@@ -12,10 +12,12 @@ import {CurrentSong} from './current.song';
 import {SeekBarComponent} from './seek.bar.component';
 import {SeekInfo} from './seek.info';
 import {Utils} from './utils';
+import {ControlsComponent} from './controls.component';
+import {ControlsInfo} from './controls.info';
 
 @Component({
   selector: 'app-root',
-  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent, SeekBarComponent],
+  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent, SeekBarComponent, ControlsComponent],
   template: `
     <menu (onReindex)="onReindex()" [versionObs]="versionObs"></menu>
     <div id="main-div">
@@ -23,22 +25,7 @@ import {Utils} from './utils';
         <current-song [currentSong]="currentSong"></current-song>
         <seek-bar (seekChange)="seekChange($event)" (seekScroll)="seekScroll($event)"
                   [seekInfo]="seekInfo"></seek-bar>
-        <div class="controls-div">
-          <button id="play-pause-btn" class="{{isPlaying() ? 'pause-btn' : 'play-btn'}}"
-                  (click)="onPlayPause()"></button>
-          <button id="prev-btn" (click)="onPrevious()"></button>
-          <button id="stop-btn" (click)="onStop()"></button>
-          <button id="next-btn" (click)="onNext()"></button>
-          <button id="loop-btn" (click)="onLoop()" class="{{loop ? 'checked' : ''}}"></button>
-          <button id="shuffle-btn" (click)="onRandom()" class="{{random ? 'checked' : ''}}"></button>
-          <div id="volume-div">
-            <input type="range" id="volume-slider"
-                   (change)="volumeControlChange($event)"
-                   (wheel)="volumeControlScroll($event)"
-                   max="256" min="0" value="{{volume}}">
-            <span id="volume-span">{{ volumePerc }}%</span>
-          </div>
-        </div>
+        <controls [controlsInfo]="controlsInfo"></controls>
         <form [formGroup]="searchForm" (ngSubmit)="search()">
           <div id="search-div">
             <input id="search-input" autocomplete="do-not-autofill" type="text" formControlName="searchPhrase"/>
@@ -99,21 +86,16 @@ import {Utils} from './utils';
     </div>`
 })
 export class AppComponent implements OnInit, OnDestroy {
+  protected readonly Utils = Utils;
+
   title = 'angularTest';
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
   itemsObs!: Observable<Item[]>;
   versionObs!: Observable<string>;
 
   currentSong = CurrentSong.createEmpty();
-  seekInfo = SeekInfo.createEmpty()
-
-  random = false;
-  loop = false;
-
-  volume = 0;
-  volumePerc = 0;
-
-  state = "";
+  seekInfo = SeekInfo.createEmpty();
+  controlsInfo = ControlsInfo.createEmpty();
 
   statusSubscription !: Subscription;
   playlistSubscription !: Subscription;
@@ -128,6 +110,9 @@ export class AppComponent implements OnInit, OnDestroy {
   searchPlaylistForm = new FormGroup({
     searchPhrase: new FormControl('')
   });
+
+  constructor(private musicService: MusicService) {
+  }
 
   ngOnInit(): void {
     this.itemsObs = this.musicService.getRootItems();
@@ -169,14 +154,7 @@ export class AppComponent implements OnInit, OnDestroy {
         }
 
         this.seekInfo = SeekInfo.create(result["length"], result["time"])
-
-        this.volume = result["volume"];
-        this.volumePerc = Math.floor(this.volume / 256 * 100);
-
-        this.random = result["random"];
-        this.loop = result["loop"];
-
-        this.state = result["state"];
+        this.controlsInfo = ControlsInfo.create(result["state"], result["random"], result["loop"], result["volume"]);
       }
     );
   }
@@ -184,9 +162,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.statusSubscription.unsubscribe();
     this.playlistSubscription.unsubscribe();
-  }
-
-  constructor(private musicService: MusicService) {
   }
 
   search() {
@@ -212,38 +187,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onReindex() {
     this.musicService.reindex();
-  }
-
-  isPlaying() {
-    return this.state == "playing";
-  }
-
-  onPlayPause() {
-    if (this.isPlaying()) {
-      this.musicService.pause();
-    } else {
-      this.musicService.play();
-    }
-  }
-
-  onStop() {
-    this.musicService.stop();
-  }
-
-  onPrevious() {
-    this.musicService.previous();
-  }
-
-  onNext() {
-    this.musicService.next();
-  }
-
-  onLoop() {
-    this.musicService.loop();
-  }
-
-  onRandom() {
-    this.musicService.random();
   }
 
   playFromPlaylist(id: number) {
@@ -274,17 +217,4 @@ export class AppComponent implements OnInit, OnDestroy {
     this.musicService.seek(slider.value);
   }
 
-  volumeControlScroll(event: WheelEvent) {
-    let slider: any = event.target;
-    let newVal = Number(slider.value) + Math.sign(-event.deltaY) * 5;
-    slider.value = newVal;
-    this.musicService.volume(newVal);
-  }
-
-  volumeControlChange(event: Event) {
-    let slider: any = event.target;
-    this.musicService.volume(slider.value);
-  }
-
-  protected readonly Utils = Utils;
 }
