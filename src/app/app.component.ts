@@ -35,11 +35,9 @@ import {PlaylistItem} from './playlist.item';
         </div>
         <div id="progress-div">
           <span id="progress-time-span">{{ positionTime }}</span>
-          <input type="range" id="progress-slider" onmousedown="elementsUnderChange['progress-slider']=true;"
-                 onmouseup="elementsUnderChange['progress-slider']=false;"
-                 onblur="elementsUnderChange['progress-slider']=false;"
-                 onchange="ajaxCall('progress?value='+this.value);"
-                 onwheel="progressControlScroll(event, val => {ajaxCall('progress?value='+val)});" min="0"
+          <input type="range" id="progress-slider"
+                 (change)="progressControlChange($event)"
+                 (wheel)="progressControlScroll($event)" min="0"
                  max="{{totalSecs}}" value="{{ currentSecs }}"/>
           <span id="progress-length-span">{{ lengthTime }}</span>
         </div>
@@ -82,7 +80,7 @@ import {PlaylistItem} from './playlist.item';
         </form>
         <div class="playlist-controls-div">
           <button (click)="emptyPlaylist()">Vyčistit</button>
-          <button onclick="ajaxCall('clearExceptPlaying')">Nechat jet hrající</button>
+          <button (click)="emptyPlaylistExceptPlaying()">Nechat jet hrající</button>
         </div>
         <div id="playlist-table-div">
           <div class="table-div" id="playlist-table">
@@ -298,5 +296,21 @@ export class AppComponent implements OnInit, OnDestroy {
 
   emptyPlaylist() {
     this.musicService.emptyPlaylist();
+  }
+
+  emptyPlaylistExceptPlaying() {
+    this.musicService.emptyPlaylistExceptPlaying();
+  }
+
+  progressControlScroll(event: WheelEvent) {
+    let slider: any = event.target;
+    let newVal = Number(slider.value) + Math.sign(-event.deltaY) * 5;
+    slider.value = newVal;
+    this.musicService.seek(newVal);
+  }
+
+  progressControlChange(event: Event) {
+    let slider: any = event.target;
+    this.musicService.seek(slider.value);
   }
 }
