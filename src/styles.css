@@ -31,6 +31,11 @@ body {
   }
 }
 
+menu {
+  margin: 0;
+  padding: 0;
+}
+
 #info-div {
   position: fixed;
   width: 100%;

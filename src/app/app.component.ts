@@ -4,35 +4,20 @@ import {Item} from './item';
 import {MusicService} from './music.service';
 import {Observable, Subscription, switchMap, timer} from 'rxjs';
 import {AsyncPipe} from '@angular/common';
-import {Version} from './version';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {PlaylistItem} from './playlist.item';
+import {MenuComponent} from './menu.component';
+import {CurrentSongComponent} from './current.song.component';
+import {CurrentSong} from './current.song';
 
 @Component({
   selector: 'app-root',
-  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule],
+  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent],
   template: `
-    <div id="menu-div">
-      <div>
-        <a href="/">GrassControl</a>
-        <div class="menu-button" (click)="onReindex()">Reindex</div>
-      </div>
-      <div>
-        @if (versionObs | async; as version) {
-          <div>Version {{ version.version }}</div>
-        }
-      </div>
-    </div>
-
+    <menu (onReindex)="onReindex()" [versionObs]="versionObs"></menu>
     <div id="main-div">
-
       <div id="library-div">
-        <div id="current-song-div">
-          <div id="current-song-artist">{{ currentSongArtist }}</div>
-          -
-          <div id="current-song-title">{{ currentSongTitle }}</div>
-          <div id="current-song-file">{{ currentSongFile }}</div>
-        </div>
+        <current-song [currentSong]="currentSong"></current-song>
         <div id="progress-div">
           <span id="progress-time-span">{{ positionTime }}</span>
           <input type="range" id="progress-slider"
@@ -91,7 +76,7 @@ import {PlaylistItem} from './playlist.item';
             </div>
             <div class="table-body-div">
               @for (item of playlistItems; track item.name) {
-                <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
+                <div class="table-body-tr-div {{item.id == currentSong.id ? 'table-tr-selected' : ''}}">
                   <div class="table-body-td-div playlist-name-div">
                     <div class="control-buttons-div">
                       <div>
@@ -120,12 +105,9 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'angularTest';
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
   itemsObs!: Observable<Item[]>;
-  versionObs!: Observable<Version>;
+  versionObs!: Observable<string>;
 
-  currentSongFile = "";
-  currentSongArtist = "";
-  currentSongTitle = "";
-  currentSongId = 0;
+  currentSong = CurrentSong.createEmpty();
 
   positionTime = "";
   lengthTime = "";
@@ -198,12 +180,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
         if (info) {
           let meta = info["category"]["meta"];
-          this.currentSongArtist = meta["artist"];
-          this.currentSongTitle = meta["title"];
-          this.currentSongFile = meta["filename"];
+          this.currentSong = CurrentSong.create(meta["artist"], meta["title"], meta["filename"], result["currentplid"])
         }
 
-        this.currentSongId = result["currentplid"];
         this.totalSecs = result["length"];
         this.currentSecs = result["time"];
         this.positionTime = this.formatTime(this.currentSecs);

@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {Item} from './item';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Version} from './version';
 
 @Injectable({
   providedIn: 'root',
@@ -55,8 +54,8 @@ export class MusicService {
     return this.http.get<Item[]>('/api/list');
   }
 
-  getVersion(): Observable<Version> {
-    return this.http.get<Version>('/api/version');
+  getVersion(): Observable<string> {
+    return this.http.get<string>('/api/version');
   }
 
   getItemsBySearch(searchPhrase: string | null | undefined): Observable<Item[]> {
