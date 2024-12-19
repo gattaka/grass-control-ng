@@ -95,7 +95,11 @@ export class MusicService {
     this.http.get('/api/emptyPlaylistExceptPlaying').subscribe();
   }
 
-  seek(seek: number) {
-    this.http.get('/api/seek?position=' + seek).subscribe();
+  seek(position: number) {
+    this.http.get('/api/seek?position=' + position).subscribe();
+  }
+
+  volume(position: number) {
+    this.http.get('/api/volume?position=' + position).subscribe();
   }
 }

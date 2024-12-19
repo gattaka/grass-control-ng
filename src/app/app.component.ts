@@ -50,11 +50,10 @@ import {PlaylistItem} from './playlist.item';
           <button id="loop-btn" (click)="onLoop()" class="{{loop ? 'checked' : ''}}"></button>
           <button id="shuffle-btn" (click)="onRandom()" class="{{random ? 'checked' : ''}}"></button>
           <div id="volume-div">
-            <input onblur="elementsUnderChange['volume-slider']=false;"
-                   onchange="ajaxCall('volume?value='+this.value);"
-                   onwheel="volumeControlScroll(event, val => {ajaxCall('volume?value='+val)});" type="range"
-                   id="volume-slider" max="256" onmousedown="elementsUnderChange['volume-slider']=true;"
-                   onmouseup="elementsUnderChange['volume-slider']=false;" min="0" value="{{volume}}">
+            <input type="range" id="volume-slider"
+                   (change)="volumeControlChange($event)"
+                   (wheel)="volumeControlScroll($event)"
+                   max="256" min="0" value="{{volume}}">
             <span id="volume-span">{{ volumePerc }}%</span>
           </div>
         </div>
@@ -312,5 +311,17 @@ export class AppComponent implements OnInit, OnDestroy {
   progressControlChange(event: Event) {
     let slider: any = event.target;
     this.musicService.seek(slider.value);
+  }
+
+  volumeControlScroll(event: WheelEvent) {
+    let slider: any = event.target;
+    let newVal = Number(slider.value) + Math.sign(-event.deltaY) * 5;
+    slider.value = newVal;
+    this.musicService.volume(newVal);
+  }
+
+  volumeControlChange(event: Event) {
+    let slider: any = event.target;
+    this.musicService.volume(slider.value);
   }
 }
