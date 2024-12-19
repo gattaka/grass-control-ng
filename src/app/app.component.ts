@@ -9,23 +9,20 @@ import {PlaylistItem} from './playlist.item';
 import {MenuComponent} from './menu.component';
 import {CurrentSongComponent} from './current.song.component';
 import {CurrentSong} from './current.song';
+import {SeekBarComponent} from './seek.bar.component';
+import {SeekInfo} from './seek.info';
+import {Utils} from './utils';
 
 @Component({
   selector: 'app-root',
-  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent],
+  imports: [GridComponent, AsyncPipe, FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent, SeekBarComponent],
   template: `
     <menu (onReindex)="onReindex()" [versionObs]="versionObs"></menu>
     <div id="main-div">
       <div id="library-div">
         <current-song [currentSong]="currentSong"></current-song>
-        <div id="progress-div">
-          <span id="progress-time-span">{{ positionTime }}</span>
-          <input type="range" id="progress-slider"
-                 (change)="progressControlChange($event)"
-                 (wheel)="progressControlScroll($event)" min="0"
-                 max="{{totalSecs}}" value="{{ currentSecs }}"/>
-          <span id="progress-length-span">{{ lengthTime }}</span>
-        </div>
+        <seek-bar (seekChange)="seekChange($event)" (seekScroll)="seekScroll($event)"
+                  [seekInfo]="seekInfo"></seek-bar>
         <div class="controls-div">
           <button id="play-pause-btn" class="{{isPlaying() ? 'pause-btn' : 'play-btn'}}"
                   (click)="onPlayPause()"></button>
@@ -91,7 +88,7 @@ import {CurrentSong} from './current.song';
                       <div class="dir-info">{{ item.uri }}</div>
                     </div>
                   </div>
-                  <div class="table-body-td-div playlist-length-div">{{ formatTime(item.length) }}</div>
+                  <div class="table-body-td-div playlist-length-div">{{ Utils.formatTime(item.length) }}</div>
                 </div>
               }
             </div>
@@ -108,12 +105,7 @@ export class AppComponent implements OnInit, OnDestroy {
   versionObs!: Observable<string>;
 
   currentSong = CurrentSong.createEmpty();
-
-  positionTime = "";
-  lengthTime = "";
-
-  totalSecs = 0;
-  currentSecs = 0;
+  seekInfo = SeekInfo.createEmpty()
 
   random = false;
   loop = false;
@@ -136,13 +128,6 @@ export class AppComponent implements OnInit, OnDestroy {
   searchPlaylistForm = new FormGroup({
     searchPhrase: new FormControl('')
   });
-
-  formatTime(timeInSec: number): string {
-    if (timeInSec == -1) return "n/a";
-    let minutes = Math.floor(timeInSec / 60);
-    let seconds = timeInSec % 60;
-    return (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-  }
 
   ngOnInit(): void {
     this.itemsObs = this.musicService.getRootItems();
@@ -183,10 +168,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.currentSong = CurrentSong.create(meta["artist"], meta["title"], meta["filename"], result["currentplid"])
         }
 
-        this.totalSecs = result["length"];
-        this.currentSecs = result["time"];
-        this.positionTime = this.formatTime(this.currentSecs);
-        this.lengthTime = this.formatTime(this.totalSecs);
+        this.seekInfo = SeekInfo.create(result["length"], result["time"])
 
         this.volume = result["volume"];
         this.volumePerc = Math.floor(this.volume / 256 * 100);
@@ -280,14 +262,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.musicService.emptyPlaylistExceptPlaying();
   }
 
-  progressControlScroll(event: WheelEvent) {
+  seekScroll(event: WheelEvent) {
     let slider: any = event.target;
     let newVal = Number(slider.value) + Math.sign(-event.deltaY) * 5;
     slider.value = newVal;
     this.musicService.seek(newVal);
   }
 
-  progressControlChange(event: Event) {
+  seekChange(event: Event) {
     let slider: any = event.target;
     this.musicService.seek(slider.value);
   }
@@ -303,4 +285,6 @@ export class AppComponent implements OnInit, OnDestroy {
     let slider: any = event.target;
     this.musicService.volume(slider.value);
   }
+
+  protected readonly Utils = Utils;
 }
