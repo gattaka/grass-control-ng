@@ -1,8 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {Item} from './item';
-import {AsyncPipe} from '@angular/common';
-import {Observable} from 'rxjs';
-import {CurrentSong} from './current.song';
+import {Component, Input} from '@angular/core';
+import {CurrentSong} from './current-song';
 
 @Component({
   selector: 'current-song',
