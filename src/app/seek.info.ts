@@ -1,7 +1,7 @@
 export class SeekInfo {
 
-  totalSecs = 0;
-  currentSecs = 0;
+  totalSecs: number;
+  currentSecs: number;
 
   static createEmpty() {
     return new SeekInfo(0, 0);

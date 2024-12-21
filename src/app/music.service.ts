@@ -1,7 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Item} from './item';
 import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
+import {CurrentSong} from './current-song';
+import {SeekInfo} from './seek.info';
+import {ControlsInfo} from './controls.info';
+import {Status} from './status';
+import {PlaylistItem} from './playlist-item';
 
 @Injectable({
   providedIn: 'root',
@@ -63,7 +68,20 @@ export class MusicService {
   }
 
   getStatus() {
-    return this.http.get<any>('/api/status');
+    return this.http.get<any>('/api/status').pipe(map(
+      result => {
+        let info = result["information"];
+
+        if (info) {
+          let meta = info["category"]["meta"];
+          const currentSong = CurrentSong.create(meta["artist"], meta["title"], meta["filename"], result["currentplid"])
+          const seekInfo = SeekInfo.create(result["length"], result["time"])
+          const controlsInfo = ControlsInfo.create(result["state"], result["random"], result["loop"], result["volume"]);
+          return Status.create(currentSong, seekInfo, controlsInfo);
+        } else {
+          return Status.createEmpty();
+        }
+      }));
   }
 
   enqueue(path: string) {
@@ -74,8 +92,29 @@ export class MusicService {
     this.http.get('/api/enqueue-and-play?path=' + path).subscribe();
   }
 
-  getPlaylist() {
-    return this.http.get<any>('/api/playlist');
+  getPlaylist(searchPlaylistPhrase: string | undefined) {
+    return this.http.get<any>('/api/playlist').pipe(map(result => {
+        const playlistItems = [];
+        if (result) {
+          const playlist = result["children"][0];
+          if (playlist) {
+            const songs = playlist["children"];
+            for (let i = 0; i < songs.length; i++) {
+              const song = songs[i];
+              const item = new PlaylistItem(song["name"], song["uri"], song["duration"], song["id"]);
+              if (searchPlaylistPhrase) {
+                if (item.name.toLowerCase().includes(searchPlaylistPhrase) || item.uri.toLowerCase().includes(searchPlaylistPhrase)) {
+                  playlistItems.push(item);
+                }
+              } else {
+                playlistItems.push(item);
+              }
+            }
+          }
+        }
+        return playlistItems;
+      }
+    ));
   }
 
   playFromPlaylist(id: number) {

@@ -36,6 +36,16 @@ menu {
   padding: 0;
 }
 
+#error-msg {
+  position: fixed;
+  background: red;
+  color: white;
+  font-size: 14px;
+  line-height: 20px;
+  width: 100%;
+  text-align: center;
+}
+
 #info-div {
   position: fixed;
   width: 100%;

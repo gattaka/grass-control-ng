@@ -62,8 +62,6 @@ import {PlaylistItem} from './playlist-item';
 export class PlaylistComponent implements OnInit, OnDestroy {
   @Input() currentSongId = 0;
 
-  protected readonly Utils = TimeFormatPipe;
-
   playlistSubscription !: Subscription;
   playlistItems = new Array<PlaylistItem>;
 
@@ -77,26 +75,12 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.playlistSubscription = timer(0, 500).pipe(
-      // TODO tady by to chtělo vyřešit handle chyb (err 404, 500 apod.), jinak se to celé zasekne
-      switchMap(() => this.musicService.getPlaylist())
-    ).subscribe(result => {
-      this.playlistItems = new Array<PlaylistItem>;
-      if (result) {
-        const playlist = result["children"][0];
-        if (playlist) {
-          const songs = playlist["children"];
-          for (let i = 0; i < songs.length; i++) {
-            const song = songs[i];
-            const item = new PlaylistItem(song["name"], song["uri"], song["duration"], song["id"]);
-            if (this.searchPlaylistPhrase) {
-              if (item.name.toLowerCase().includes(this.searchPlaylistPhrase) || item.uri.toLowerCase().includes(this.searchPlaylistPhrase)) {
-                this.playlistItems.push(item);
-              }
-            } else {
-              this.playlistItems.push(item);
-            }
-          }
-        }
+      switchMap(() => this.musicService.getPlaylist(this.searchPlaylistPhrase))
+    ).subscribe({
+      next: result => {
+        this.playlistItems = result;
+      },
+      error: _ => {
       }
     });
   }
@@ -109,11 +93,17 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     this.searchPlaylistPhrase = this.searchPlaylistForm.value.searchPhrase?.toLowerCase();
   }
 
-  playFromPlaylist(id: number) {
+  playFromPlaylist(id
+                   :
+                   number
+  ) {
     this.musicService.playFromPlaylist(id);
   }
 
-  removeFromPlaylist(id: number) {
+  removeFromPlaylist(id
+                     :
+                     number
+  ) {
     this.musicService.removeFromPlaylist(id);
   }
 

@@ -4,7 +4,7 @@ import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {Observable} from 'rxjs';
+import {catchError, Observable, of} from 'rxjs';
 
 @Component({
   selector: 'library',
@@ -60,13 +60,16 @@ import {Observable} from 'rxjs';
 export class LibraryComponent implements OnInit {
 
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
-  itemsObs!: Observable<Item[]>;
+  itemsObs!: Observable<Item[] | null>;
 
   constructor(private musicService: MusicService) {
   }
 
   ngOnInit(): void {
-    this.itemsObs = this.musicService.getRootItems();
+    // https://stackoverflow.com/questions/79024569/how-to-use-angular-async-pipe-to-display-errors-and-loading-statuses-on-route-pa
+    this.itemsObs = this.musicService.getRootItems().pipe(catchError(err => {
+      return of(null);
+    }));
   }
 
   searchForm = new FormGroup({
