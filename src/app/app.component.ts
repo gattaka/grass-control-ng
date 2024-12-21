@@ -25,7 +25,7 @@ import {PlaylistComponent} from './playlist.component';
         <library></library>
       </div>
       <div id="right-div">
-        <playlist></playlist>
+        <playlist [currentSongId]="currentSong.id"></playlist>
       </div>
     </div>`
 })
