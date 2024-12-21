@@ -5,7 +5,7 @@ import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
 import {Observable, Subscription, switchMap, timer} from 'rxjs';
-import {Utils} from './utils';
+import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
 
 @Component({
@@ -47,7 +47,7 @@ import {PlaylistItem} from './playlist-item';
                   <div class="dir-info">{{ item.uri }}</div>
                 </div>
               </div>
-              <div class="table-body-td-div playlist-length-div">{{ Utils.formatTime(item.length) }}</div>
+              <div class="table-body-td-div playlist-length-div">{{ item.length | timeFormat }}</div>
             </div>
           }
         </div>
@@ -55,13 +55,14 @@ import {PlaylistItem} from './playlist-item';
     </div>`,
   imports: [
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TimeFormatPipe
   ]
 })
 export class PlaylistComponent implements OnInit, OnDestroy {
   @Input() currentSongId = 0;
 
-  protected readonly Utils = Utils;
+  protected readonly Utils = TimeFormatPipe;
 
   playlistSubscription !: Subscription;
   playlistItems = new Array<PlaylistItem>;
