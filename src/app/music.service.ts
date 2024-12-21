@@ -60,7 +60,7 @@ export class MusicService {
   }
 
   getVersion(): Observable<string> {
-    return this.http.get<string>('/api/version');
+    return this.http.get<any>('/api/version').pipe(map(result => result["version"]));
   }
 
   getItemsBySearch(searchPhrase: string | null | undefined): Observable<Item[]> {

@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LibraryComponent} from './library.component';
 import {MusicService} from './music.service';
-import {Observable, Subscription, switchMap, timer} from 'rxjs';
+import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MenuComponent} from './menu.component';
 import {CurrentSongComponent} from './current-song.component';
@@ -43,13 +43,21 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    // https://stackoverflow.com/questions/65662690/timer-stops-whenever-an-error-occurred-in-the-subscription
+    // https://stackoverflow.com/a/65663035
     this.statusSubscription = timer(0, 500).pipe(
-      switchMap(() => this.musicService.getStatus())
-    ).subscribe({
-        next: status => {
+      switchMap(_ => this.musicService.getStatus().pipe(
+        catchError(err => {
+            this.errorMsg = "Připojení k serveru selhalo";
+            return of(null);
+          }
+        )
+      ))
+    ).subscribe(
+      status => {
+        if (status) {
           this.status = status;
-        }, error: _ => {
-          this.errorMsg = "Připojení k serveru selhalo";
+          this.errorMsg = "";
         }
       }
     );

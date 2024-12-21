@@ -31,7 +31,7 @@ import {PlaylistItem} from './playlist-item';
           </div>
         </div>
         <div class="table-body-div">
-          @for (item of playlistItems; track item.name) {
+          @for (item of playlistItems; track item.id) {
             <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
               <div class="table-body-td-div playlist-name-div">
                 <div class="control-buttons-div">
