@@ -126,12 +126,16 @@ menu {
   padding-right: 0;
 }
 
-#library-div, #playlist-div {
+#left-div, #right-div {
   box-sizing: border-box;
   height: calc(100vh - var(--menu-height) - var(--menu-border-height));
   display: flex;
   flex-direction: column;
   width: 50%;
+}
+
+library, playlist {
+  display: contents;
 }
 
 #playlist-table-div {
