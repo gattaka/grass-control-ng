@@ -1,10 +1,23 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
 import {Item} from './item';
 import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {catchError, defer, delay, delayWhen, Observable, of, retry, retryWhen, tap, throwError, timer} from 'rxjs';
+import {
+  catchError,
+  defer,
+  delay,
+  delayWhen, mergeMap,
+  Observable,
+  of,
+  retry,
+  retryWhen,
+  switchMap,
+  tap,
+  throwError,
+  timer
+} from 'rxjs';
 
 @Component({
   selector: 'library',
@@ -15,6 +28,9 @@ import {catchError, defer, delay, delayWhen, Observable, of, retry, retryWhen, t
         <button type="submit">Vyhledat</button>
       </div>
     </form>
+    @if (libraryUnavailable) {
+      <div id="library-unavailable-div">⚠️ Knihovna není dostupná</div>
+    }
     @if (itemsObs | async; as items) {
       <div class="table-div" id="library-table">
         <div class="table-head-div">
@@ -49,9 +65,8 @@ import {catchError, defer, delay, delayWhen, Observable, of, retry, retryWhen, t
           }
         </div>
       </div>
-    } @else {
-      <div id="library-unavailable-div">⚠️ Knihovna není dostupná</div>
-    }`,
+    }
+  `,
   imports: [
     ActionButtonComponent,
     AsyncPipe,
@@ -63,8 +78,9 @@ export class LibraryComponent implements OnInit {
 
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
   itemsObs!: Observable<Item[] | null>;
+  libraryUnavailable = false;
 
-  constructor(private musicService: MusicService) {
+  constructor(private musicService: MusicService, private cdr: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
@@ -73,8 +89,12 @@ export class LibraryComponent implements OnInit {
 
   private createItemObs(obs: Observable<Item[]>) {
     this.itemsObs = obs.pipe(
+      tap(value => {
+        this.libraryUnavailable = false;
+      }),
       retry({
         delay: (_) => {
+          this.libraryUnavailable = true;
           return timer(2000);
         }
       }));
@@ -93,7 +113,10 @@ export class LibraryComponent implements OnInit {
     this.itemsObs = this.musicService.getItemsBySearch(value);
   }
 
-  openParentDir(item: Item) {
+  openParentDir(item
+                :
+                Item
+  ) {
     const lastIndex = item.path.lastIndexOf("/");
     console.log("item.path '" + item.path + "'");
     if (lastIndex > -1) {
@@ -103,19 +126,31 @@ export class LibraryComponent implements OnInit {
     }
   }
 
-  openCurrentDir(item: Item) {
+  openCurrentDir(item
+                 :
+                 Item
+  ) {
     this.list(item.path);
   }
 
-  openDir(item: Item) {
+  openDir(item
+          :
+          Item
+  ) {
     this.list(item.path + "/" + item.name);
   }
 
-  enque(item: Item) {
+  enque(item
+        :
+        Item
+  ) {
     this.musicService.enqueue(item.path + "/" + item.name)
   }
 
-  enqueAndPlay(item: Item) {
+  enqueAndPlay(item
+               :
+               Item
+  ) {
     this.musicService.enqueueAndPlay(item.path + "/" + item.name);
   }
 }

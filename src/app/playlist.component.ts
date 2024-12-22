@@ -4,7 +4,7 @@ import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {Observable, Subscription, switchMap, timer} from 'rxjs';
+import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
 import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
 
@@ -80,16 +80,21 @@ export class PlaylistComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.playlistSubscription = timer(0, 500).pipe(
-      switchMap(() => this.musicService.getPlaylist(this.searchPlaylistPhrase))
-    ).subscribe({
-      next: result => {
-        this.playlistUnavailable = false;
-        this.playlistItems = result;
-      },
-      error: _ => {
-        this.playlistUnavailable = true;
+      switchMap(_ => this.musicService.getPlaylist(this.searchPlaylistPhrase).pipe(
+        catchError(err => {
+            this.playlistUnavailable = true;
+            return of(null);
+          }
+        )
+      ))
+    ).subscribe(
+      result => {
+        if (result) {
+          this.playlistUnavailable = false;
+          this.playlistItems = result;
+        }
       }
-    });
+    );
   }
 
   ngOnDestroy() {
