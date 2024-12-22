@@ -19,7 +19,6 @@ import {ControlsInfo} from './controls.info';
       <div id="volume-div">
         <input type="range" id="volume-slider"
                (change)="volumeControlChange($event)"
-               (wheel)="volumeControlScroll($event)"
                max="256" min="0" value="{{controlsInfo.volume}}">
         <span id="volume-span">{{ controlsInfo.volumePerc }}%</span>
       </div>
