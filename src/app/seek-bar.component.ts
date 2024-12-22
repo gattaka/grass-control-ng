@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {SeekInfo} from './seek.info';
 import {TimeFormatPipe} from './time-format.pipe';
 import {MusicService} from './music.service';
@@ -13,16 +13,23 @@ import {MusicService} from './music.service';
       <span id="progress-time-span">{{ seekInfo.currentSecs | timeFormat }}</span>
       <input type="range" id="progress-slider"
              (change)="seekChange($event)"
-             (wheel)="seekScroll($event)" min="0"
-             max="{{seekInfo.totalSecs}}" value="{{ seekInfo.currentSecs }}"/>
+             min="0" max="{{seekInfo.totalSecs}}" value="{{ seekInfo.currentSecs }}"/>
       <span id="progress-length-span">{{ seekInfo.totalSecs | timeFormat }}</span>
     </div>`
 })
-export class SeekBarComponent {
+export class SeekBarComponent implements OnInit {
   @Input() seekInfo = SeekInfo.createEmpty();
   protected readonly Utils = TimeFormatPipe;
 
   constructor(private musicService: MusicService) {
+  }
+
+  ngOnInit(): void {
+    const element = document.getElementById("progress-slider");
+    if (element)
+      element.addEventListener('wheel', (e) => {
+        this.seekScroll(e);
+      }, {passive: false});
   }
 
   seekScroll(event: WheelEvent) {
@@ -36,4 +43,5 @@ export class SeekBarComponent {
     let slider: any = event.target;
     this.musicService.seek(slider.value);
   }
+
 }

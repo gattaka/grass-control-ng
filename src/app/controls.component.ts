@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Item} from './item';
 import {AsyncPipe} from '@angular/common';
 import {Observable} from 'rxjs';
@@ -25,10 +25,18 @@ import {ControlsInfo} from './controls.info';
       </div>
     </div>`
 })
-export class ControlsComponent {
+export class ControlsComponent implements OnInit {
   @Input() controlsInfo = ControlsInfo.createEmpty();
 
   constructor(private musicService: MusicService) {
+  }
+
+  ngOnInit(): void {
+    const element = document.getElementById("volume-slider");
+    if (element)
+      element.addEventListener('wheel', (e) => {
+        this.volumeControlScroll(e);
+      }, {passive: false});
   }
 
   onPlayPause() {
