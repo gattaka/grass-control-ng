@@ -49,6 +49,9 @@ export class AppComponent implements OnInit, OnDestroy {
       switchMap(_ => this.musicService.getStatus().pipe(
         catchError(err => {
             this.errorMsg = "Připojení k serveru selhalo";
+            const details = err["error"];
+            if (details)
+              this.errorMsg += " (" + details + ")";
             return of(null);
           }
         )
