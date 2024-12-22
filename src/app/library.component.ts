@@ -4,7 +4,7 @@ import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {catchError, Observable, of, retry} from 'rxjs';
+import {catchError, defer, delay, delayWhen, Observable, of, retry, retryWhen, tap, throwError, timer} from 'rxjs';
 
 @Component({
   selector: 'library',
@@ -49,6 +49,8 @@ import {catchError, Observable, of, retry} from 'rxjs';
           }
         </div>
       </div>
+    } @else {
+      <div id="library-unavailable-div">⚠️ Knihovna není dostupná</div>
     }`,
   imports: [
     ActionButtonComponent,
@@ -66,10 +68,16 @@ export class LibraryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // https://stackoverflow.com/questions/79024569/how-to-use-angular-async-pipe-to-display-errors-and-loading-statuses-on-route-pa
-    this.itemsObs = this.musicService.getRootItems().pipe(catchError(err => {
-      return of(null);
-    }), retry({delay: 1000}));
+    this.createItemObs(this.musicService.getRootItems());
+  }
+
+  private createItemObs(obs: Observable<Item[]>) {
+    this.itemsObs = obs.pipe(
+      retry({
+        delay: (_) => {
+          return timer(2000);
+        }
+      }));
   }
 
   searchForm = new FormGroup({
@@ -77,7 +85,7 @@ export class LibraryComponent implements OnInit {
   });
 
   list(path = "") {
-    this.itemsObs = this.musicService.getItems(path);
+    this.createItemObs(this.musicService.getItems(path));
   }
 
   search() {

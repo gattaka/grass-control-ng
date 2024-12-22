@@ -22,37 +22,41 @@ import {PlaylistItem} from './playlist-item';
       <button (click)="emptyPlaylist()">Vyčistit</button>
       <button (click)="emptyPlaylistExceptPlaying()">Nechat jet hrající</button>
     </div>
-    <div id="playlist-table-div">
-      <div class="table-div" id="playlist-table">
-        <div class="table-head-div">
-          <div class="table-head-tr-div">
-            <div class="table-head-td-div playlist-name-div">Název</div>
-            <div class="table-head-td-div playlist-length-div">Délka</div>
+    @if (!playlistUnavailable) {
+      <div id="playlist-table-div">
+        <div class="table-div" id="playlist-table">
+          <div class="table-head-div">
+            <div class="table-head-tr-div">
+              <div class="table-head-td-div playlist-name-div">Název</div>
+              <div class="table-head-td-div playlist-length-div">Délka</div>
+            </div>
+          </div>
+          <div class="table-body-div">
+            @for (item of playlistItems; track item.id) {
+              <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
+                <div class="table-body-td-div playlist-name-div">
+                  <div class="control-buttons-div">
+                    <div>
+                      <button class="table-control-btn" (click)="removeFromPlaylist(item.id)">✖</button>
+                    </div>
+                    <div>
+                      <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
+                    </div>
+                  </div>
+                  <div class="item-div">
+                    <div class="name-div">{{ item.name }}</div>
+                    <div class="dir-info">{{ item.uri }}</div>
+                  </div>
+                </div>
+                <div class="table-body-td-div playlist-length-div">{{ item.length | timeFormat }}</div>
+              </div>
+            }
           </div>
         </div>
-        <div class="table-body-div">
-          @for (item of playlistItems; track item.id) {
-            <div class="table-body-tr-div {{item.id == currentSongId ? 'table-tr-selected' : ''}}">
-              <div class="table-body-td-div playlist-name-div">
-                <div class="control-buttons-div">
-                  <div>
-                    <button class="table-control-btn" (click)="removeFromPlaylist(item.id)">✖</button>
-                  </div>
-                  <div>
-                    <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
-                  </div>
-                </div>
-                <div class="item-div">
-                  <div class="name-div">{{ item.name }}</div>
-                  <div class="dir-info">{{ item.uri }}</div>
-                </div>
-              </div>
-              <div class="table-body-td-div playlist-length-div">{{ item.length | timeFormat }}</div>
-            </div>
-          }
-        </div>
       </div>
-    </div>`,
+    } @else {
+      <div id="playlist-unavailable-div">⚠️ Playlist není dostupný</div>
+    }`,
   imports: [
     FormsModule,
     ReactiveFormsModule,
@@ -62,6 +66,7 @@ import {PlaylistItem} from './playlist-item';
 export class PlaylistComponent implements OnInit, OnDestroy {
   @Input() currentSongId = 0;
 
+  playlistUnavailable = false;
   playlistSubscription !: Subscription;
   playlistItems = new Array<PlaylistItem>;
 
@@ -78,9 +83,11 @@ export class PlaylistComponent implements OnInit, OnDestroy {
       switchMap(() => this.musicService.getPlaylist(this.searchPlaylistPhrase))
     ).subscribe({
       next: result => {
+        this.playlistUnavailable = false;
         this.playlistItems = result;
       },
       error: _ => {
+        this.playlistUnavailable = true;
       }
     });
   }

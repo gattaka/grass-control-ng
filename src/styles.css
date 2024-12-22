@@ -148,6 +148,19 @@ library, playlist {
   display: contents;
 }
 
+#library-unavailable-div, #playlist-unavailable-div {
+  height: 100%;
+  border: 1px solid var(--unchecked-border-color);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+  align-content: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #f5f5f5 10px, #efefef 20px);
+}
+
 #playlist-table-div {
   display: flex;
   flex-direction: column;
