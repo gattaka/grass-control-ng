@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Item} from './item';
+import {Component, OnInit} from '@angular/core';
 import {AsyncPipe} from '@angular/common';
-import {catchError, Observable, of, retry, tap, timer} from 'rxjs';
+import {Observable, retry, timer} from 'rxjs';
 import {MusicService} from './music.service';
 
 @Component({
@@ -25,7 +24,7 @@ import {MusicService} from './music.service';
     </div>`
 })
 export class AppMenuComponent implements OnInit {
-  versionObs!: Observable<string | null>;
+  versionObs!: Observable<string>;
 
   constructor(private musicService: MusicService) {
   }
