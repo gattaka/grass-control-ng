@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Item} from './item';
 import {AsyncPipe} from '@angular/common';
-import {catchError, Observable, of} from 'rxjs';
+import {catchError, Observable, of, retry, tap, timer} from 'rxjs';
 import {MusicService} from './music.service';
 
 @Component({
-  selector: 'menu',
+  selector: 'app-menu',
   imports: [
     AsyncPipe
   ],
@@ -24,17 +24,19 @@ import {MusicService} from './music.service';
       </div>
     </div>`
 })
-export class MenuComponent implements OnInit {
+export class AppMenuComponent implements OnInit {
   versionObs!: Observable<string | null>;
 
   constructor(private musicService: MusicService) {
   }
 
   ngOnInit(): void {
-    // https://stackoverflow.com/questions/79024569/how-to-use-angular-async-pipe-to-display-errors-and-loading-statuses-on-route-pa
-    this.versionObs = this.musicService.getVersion().pipe(catchError(err => {
-      return of(null);
-    }));
+    this.versionObs = this.musicService.getVersion().pipe(
+      retry({
+        delay: (_) => {
+          return timer(2000);
+        }
+      }));
   }
 
   onReindex() {

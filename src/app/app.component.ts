@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LibraryComponent} from './library.component';
 import {MusicService} from './music.service';
-import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
+import {catchError, of, Subscription, switchMap, timer} from 'rxjs';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MenuComponent} from './menu.component';
+import {AppMenuComponent} from './app-menu.component';
 import {CurrentSongComponent} from './current-song.component';
 import {SeekBarComponent} from './seek-bar.component';
 import {ControlsComponent} from './controls.component';
@@ -12,9 +12,9 @@ import {Status} from './status';
 
 @Component({
   selector: 'app-root',
-  imports: [FormsModule, ReactiveFormsModule, MenuComponent, CurrentSongComponent, SeekBarComponent, ControlsComponent, LibraryComponent, PlaylistComponent],
+  imports: [FormsModule, ReactiveFormsModule, AppMenuComponent, CurrentSongComponent, SeekBarComponent, ControlsComponent, LibraryComponent, PlaylistComponent],
   template: `
-    <menu></menu>
+    <app-menu></app-menu>
     @if (errorMsg.length > 0) {
       <div id="error-msg">{{ errorMsg }}</div>
     }
@@ -42,9 +42,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
-    // https://stackoverflow.com/questions/65662690/timer-stops-whenever-an-error-occurred-in-the-subscription
-    // https://stackoverflow.com/a/65663035
     this.statusSubscription = timer(0, 500).pipe(
       switchMap(_ => this.musicService.getStatus().pipe(
         catchError(err => {
