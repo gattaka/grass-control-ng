@@ -7,6 +7,7 @@ import {SeekInfo} from './seek.info';
 import {ControlsInfo} from './controls.info';
 import {Status} from './status';
 import {PlaylistItem} from './playlist-item';
+import {Tag} from './tag';
 
 @Injectable({
   providedIn: 'root',
@@ -52,11 +53,13 @@ export class MusicService {
   }
 
   getItems(path = ""): Observable<Item[]> {
-    return this.http.get<Item[]>('/api/list?path=' + path);
+    if (path === "")
+      return this.getRootItems();
+    return this.http.get<Item[]>('/api/list/' + path);
   }
 
   getRootItems(): Observable<Item[]> {
-    return this.http.get<Item[]>('/api/list');
+    return this.http.get<Item[]>('/api/list-all');
   }
 
   getVersion(): Observable<string> {
@@ -64,7 +67,11 @@ export class MusicService {
   }
 
   getItemsBySearch(searchPhrase: string | null | undefined): Observable<Item[]> {
-    return this.http.get<Item[]>('/api/search?searchPhrase=' + searchPhrase);
+    if (searchPhrase) {
+      return this.http.get<Item[]>('/api/search/' + searchPhrase);
+    } else {
+      return this.getRootItems();
+    }
   }
 
   getStatus() {
@@ -85,11 +92,11 @@ export class MusicService {
   }
 
   enqueue(path: string) {
-    this.http.get('/api/enqueue?path=' + path).subscribe();
+    this.http.get('/api/enqueue/' + path).subscribe();
   }
 
   enqueueAndPlay(path: string) {
-    this.http.get('/api/enqueue-and-play?path=' + path).subscribe();
+    this.http.get('/api/enqueue-and-play/' + path).subscribe();
   }
 
   getPlaylist(searchPlaylistPhrase: string | undefined) {
@@ -117,27 +124,35 @@ export class MusicService {
     ));
   }
 
+  readTag(id: number) {
+    this.http.get('/api/read-tag/' + id).subscribe();
+  }
+
+  writeTag(id: number, tag: Tag) {
+    this.http.put('/api/write-tag/' + id, tag).subscribe();
+  }
+
   playFromPlaylist(id: number) {
-    this.http.get('/api/playFromPlaylist?id=' + id).subscribe();
+    this.http.get('/api/play-from-playlist/' + id).subscribe();
   }
 
   removeFromPlaylist(id: number) {
-    this.http.get('/api/removeFromPlaylist?id=' + id).subscribe();
+    this.http.get('/api/remove-from-playlist/' + id).subscribe();
   }
 
   emptyPlaylist() {
-    this.http.get('/api/emptyPlaylist').subscribe();
+    this.http.get('/api/empty-playlist').subscribe();
   }
 
   emptyPlaylistExceptPlaying() {
-    this.http.get('/api/emptyPlaylistExceptPlaying').subscribe();
+    this.http.get('/api/empty-playlist-except-playing').subscribe();
   }
 
   seek(position: number) {
-    this.http.get('/api/seek?position=' + position).subscribe();
+    this.http.get('/api/seek/' + position).subscribe();
   }
 
   volume(position: number) {
-    this.http.get('/api/volume?position=' + position).subscribe();
+    this.http.get('/api/volume/' + position).subscribe();
   }
 }

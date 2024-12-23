@@ -7,6 +7,7 @@ import {MusicService} from './music.service';
 import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
 import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
+import {Tag} from './tag';
 
 @Component({
   selector: 'playlist',
@@ -41,6 +42,12 @@ import {PlaylistItem} from './playlist-item';
                     </div>
                     <div>
                       <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
+                    </div>
+                    <div>
+                      <button class="table-control-btn" (click)="readTag(item.id)">i</button>
+                    </div>
+                    <div>
+                      <button class="table-control-btn" (click)="writeTag(item.id)">!!!</button>
                     </div>
                   </div>
                   <div class="item-div">
@@ -105,17 +112,21 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     this.searchPlaylistPhrase = this.searchPlaylistForm.value.searchPhrase?.toLowerCase();
   }
 
-  playFromPlaylist(id
-                   :
-                   number
-  ) {
+  readTag(id: number) {
+    this.musicService.readTag(id);
+  }
+
+  writeTag(id: number) {
+    // TODO content
+    const tag = new Tag("MyTitle", "MyArtist", "MyAlbum", "MyYear", "MyTrack", "MyComposer");
+    this.musicService.writeTag(id, tag);
+  }
+
+  playFromPlaylist(id: number) {
     this.musicService.playFromPlaylist(id);
   }
 
-  removeFromPlaylist(id
-                     :
-                     number
-  ) {
+  removeFromPlaylist(id: number) {
     this.musicService.removeFromPlaylist(id);
   }
 
