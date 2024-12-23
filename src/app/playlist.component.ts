@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
 import {Item} from './item';
 import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
@@ -8,6 +8,7 @@ import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
 import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
 import {Tag} from './tag';
+import {TagDialogComponent} from './tag-dialog.component';
 
 @Component({
   selector: 'playlist',
@@ -44,7 +45,7 @@ import {Tag} from './tag';
                       <button class="table-control-btn" (click)="playFromPlaylist(item.id)">⏵</button>
                     </div>
                     <div>
-                      <button class="table-control-btn" (click)="readTag(item.id)">i</button>
+                      <button class="table-control-btn" (click)="openTagDialog(item.id)">i</button>
                     </div>
                     <div>
                       <button class="table-control-btn" (click)="writeTag(item.id)">!!!</button>
@@ -82,7 +83,7 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     searchPhrase: new FormControl('')
   });
 
-  constructor(private musicService: MusicService) {
+  constructor(private musicService: MusicService, private viewContainer: ViewContainerRef) {
   }
 
   ngOnInit(): void {
@@ -112,8 +113,10 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     this.searchPlaylistPhrase = this.searchPlaylistForm.value.searchPhrase?.toLowerCase();
   }
 
-  readTag(id: number) {
-    this.musicService.readTag(id);
+  openTagDialog(id: number) {
+    const ref = this.viewContainer.createComponent(TagDialogComponent);
+    ref.setInput("id", id);
+    ref.instance.viewParent = this.viewContainer;
   }
 
   writeTag(id: number) {

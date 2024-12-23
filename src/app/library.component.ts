@@ -80,6 +80,10 @@ export class LibraryComponent implements OnInit {
   itemsObs!: Observable<Item[] | null>;
   libraryUnavailable = false;
 
+  searchForm = new FormGroup({
+    searchPhrase: new FormControl('')
+  });
+
   constructor(private musicService: MusicService, private cdr: ChangeDetectorRef) {
   }
 
@@ -99,10 +103,6 @@ export class LibraryComponent implements OnInit {
         }
       }));
   }
-
-  searchForm = new FormGroup({
-    searchPhrase: new FormControl('')
-  });
 
   list(path = "") {
     this.createItemObs(this.musicService.getItems(path));

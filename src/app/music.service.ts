@@ -125,7 +125,11 @@ export class MusicService {
   }
 
   readTag(id: number) {
-    this.http.get('/api/read-tag/' + id).subscribe();
+    return this.http.get<any>('/api/read-tag/' + id).pipe(map(result => {
+        console.log(result);
+        return new Tag(result["title"], result["artist"], result["album"], result["year"], result["track"], result["composer"]);
+      }
+    ));
   }
 
   writeTag(id: number, tag: Tag) {
