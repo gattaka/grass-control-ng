@@ -1,6 +1,6 @@
 export class Tag {
 
-  title: string;
+  title: string | null;
   artist: string;
   album: string;
   year: string;
@@ -8,7 +8,7 @@ export class Tag {
   composer: string;
 
 
-  constructor(title: string, artist: string, album: string, year: string, track: string, composer: string) {
+  constructor(title: string | null, artist: string, album: string, year: string, track: string, composer: string) {
     this.title = title;
     this.artist = artist;
     this.album = album;

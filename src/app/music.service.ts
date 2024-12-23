@@ -125,15 +125,13 @@ export class MusicService {
   }
 
   readTag(id: number) {
-    return this.http.get<any>('/api/read-tag/' + id).pipe(map(result => {
-        console.log(result);
-        return new Tag(result["title"], result["artist"], result["album"], result["year"], result["track"], result["composer"]);
-      }
+    return this.http.get<any>('/api/read-tag/' + id).pipe(map(result =>
+      new Tag(result["title"], result["artist"], result["album"], result["year"], result["track"], result["composer"])
     ));
   }
 
   writeTag(id: number, tag: Tag) {
-    this.http.put('/api/write-tag/' + id, tag).subscribe();
+    return this.http.put('/api/write-tag/' + id, tag);
   }
 
   playFromPlaylist(id: number) {

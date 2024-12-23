@@ -50,7 +50,14 @@ export class TagDialogComponent implements OnInit {
 
   public viewParent: ViewContainerRef | null = null;
 
-  dialogForm! : FormGroup;
+  dialogForm = new FormGroup({
+    title: new FormControl(''),
+    artist: new FormControl(''),
+    album: new FormControl(''),
+    year: new FormControl(''),
+    track: new FormControl(''),
+    composer: new FormControl('')
+  });
 
   constructor(private musicService: MusicService) {
   }
@@ -62,14 +69,15 @@ export class TagDialogComponent implements OnInit {
           return timer(2000);
         }
       })).subscribe(tag => {
-      this.dialogForm = new FormGroup({
-        title: new FormControl(tag.title),
-        artist: new FormControl(tag.artist),
-        album: new FormControl(tag.album),
-        year: new FormControl(tag.year),
-        track: new FormControl(tag.track),
-        composer: new FormControl(tag.composer),
-      });
+      this.dialogForm.setValue(
+        {
+          title: tag.title,
+          artist: tag.artist,
+          album: tag.album,
+          year: tag.year,
+          track: tag.track,
+          composer: tag.composer
+        });
     });
   }
 
@@ -79,8 +87,15 @@ export class TagDialogComponent implements OnInit {
 
   saveTags() {
     const val = this.dialogForm.value;
-    this.musicService.writeTag(this.id, new Tag(val.title, val.artist, val.album, val.year, val.track, val.composer));
-    this.close();
+    // undefinedToNull
+    const u2n = (val: string | null | undefined) => val ? val : "";
+    const tag = new Tag(u2n(val.title), u2n(val.artist), u2n(val.album), u2n(val.year), u2n(val.track), u2n(val.composer));
+    this.musicService.writeTag(this.id, tag).subscribe({
+      next: _ => {
+        this.close();
+      }, error: _ => {
+        alert("Nezdařilo se zapsat úpravy tagů");
+      }
+    });
   }
-
 }

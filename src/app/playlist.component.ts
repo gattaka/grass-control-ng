@@ -47,9 +47,6 @@ import {TagDialogComponent} from './tag-dialog.component';
                     <div>
                       <button class="table-control-btn" (click)="openTagDialog(item.id)">i</button>
                     </div>
-                    <div>
-                      <button class="table-control-btn" (click)="writeTag(item.id)">!!!</button>
-                    </div>
                   </div>
                   <div class="item-div">
                     <div class="name-div">{{ item.name }}</div>
@@ -117,12 +114,6 @@ export class PlaylistComponent implements OnInit, OnDestroy {
     const ref = this.viewContainer.createComponent(TagDialogComponent);
     ref.setInput("id", id);
     ref.instance.viewParent = this.viewContainer;
-  }
-
-  writeTag(id: number) {
-    // TODO content
-    const tag = new Tag("MyTitle", "MyArtist", "MyAlbum", "MyYear", "MyTrack", "MyComposer");
-    this.musicService.writeTag(id, tag);
   }
 
   playFromPlaylist(id: number) {
