@@ -52,5 +52,3 @@ export class AppMenuComponent implements OnInit {
     this.musicService.shutdown();
   }
 }
-
-

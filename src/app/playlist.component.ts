@@ -1,13 +1,9 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewContainerRef} from '@angular/core';
-import {Item} from './item';
-import {ActionButtonComponent} from './action-button.component';
-import {AsyncPipe} from '@angular/common';
+import {Component, Input, OnDestroy, OnInit, ViewContainerRef} from '@angular/core';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {catchError, Observable, of, Subscription, switchMap, timer} from 'rxjs';
+import {catchError, of, Subscription, switchMap, timer} from 'rxjs';
 import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
-import {Tag} from './tag';
 import {TagDialogComponent} from './tag-dialog.component';
 
 @Component({

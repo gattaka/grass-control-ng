@@ -1,23 +1,10 @@
-import {ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Item} from './item';
 import {ActionButtonComponent} from './action-button.component';
 import {AsyncPipe} from '@angular/common';
 import {FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MusicService} from './music.service';
-import {
-  catchError,
-  defer,
-  delay,
-  delayWhen, mergeMap,
-  Observable,
-  of,
-  retry,
-  retryWhen,
-  switchMap,
-  tap,
-  throwError,
-  timer
-} from 'rxjs';
+import {catchError, Observable, of, retry, tap, timer} from 'rxjs';
 
 @Component({
   selector: 'library',
@@ -113,10 +100,7 @@ export class LibraryComponent implements OnInit {
     this.itemsObs = this.musicService.getItemsBySearch(value);
   }
 
-  openParentDir(item
-                :
-                Item
-  ) {
+  openParentDir(item: Item) {
     const lastIndex = item.path.lastIndexOf("/");
     console.log("item.path '" + item.path + "'");
     if (lastIndex > -1) {
@@ -126,31 +110,28 @@ export class LibraryComponent implements OnInit {
     }
   }
 
-  openCurrentDir(item
-                 :
-                 Item
-  ) {
+  openCurrentDir(item: Item) {
     this.list(item.path);
   }
 
-  openDir(item
-          :
-          Item
-  ) {
+  openDir(item: Item) {
     this.list(item.path + "/" + item.name);
   }
 
-  enque(item
-        :
-        Item
-  ) {
-    this.musicService.enqueue(item.path + "/" + item.name)
+  enque(item: Item) {
+    this.musicService.enqueue(item.path + "/" + item.name).pipe(catchError(err => {
+        alert(err.message);
+        return of(null);
+      }
+    )).subscribe();
   }
 
-  enqueAndPlay(item
-               :
-               Item
-  ) {
-    this.musicService.enqueueAndPlay(item.path + "/" + item.name);
+  enqueAndPlay(item: Item) {
+    this.musicService.enqueueAndPlay(item.path + "/" + item.name).pipe(catchError(err => {
+        alert(err.message);
+        return of(null);
+      }
+    )).subscribe();
   }
+
 }

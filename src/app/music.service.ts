@@ -92,11 +92,11 @@ export class MusicService {
   }
 
   enqueue(path: string) {
-    this.http.get('/api/enqueue/' + path).subscribe();
+    return this.http.get('/api/enqueue/' + path);
   }
 
   enqueueAndPlay(path: string) {
-    this.http.get('/api/enqueue-and-play/' + path).subscribe();
+    return this.http.get('/api/enqueue-and-play/' + path);
   }
 
   getPlaylist(searchPlaylistPhrase: string | undefined) {
