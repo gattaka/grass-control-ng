@@ -16,6 +16,10 @@ export class MusicService {
   constructor(private http: HttpClient) {
   }
 
+  private encode(path: string) {
+    return encodeURIComponent(path).replaceAll("%2F", "/");
+  }
+
   play() {
     this.http.get('/api/play').subscribe();
   }
@@ -55,7 +59,7 @@ export class MusicService {
   getItems(path = ""): Observable<Item[]> {
     if (path === "")
       return this.getRootItems();
-    return this.http.get<Item[]>('/api/list/' + path);
+    return this.http.get<Item[]>('/api/list/' + this.encode(path));
   }
 
   getRootItems(): Observable<Item[]> {
@@ -92,11 +96,11 @@ export class MusicService {
   }
 
   enqueue(path: string) {
-    return this.http.get('/api/enqueue/' + path);
+    return this.http.get('/api/enqueue/' + this.encode(path));
   }
 
   enqueueAndPlay(path: string) {
-    return this.http.get('/api/enqueue-and-play/' + path);
+    return this.http.get('/api/enqueue-and-play/' + this.encode(path));
   }
 
   getPlaylist(searchPlaylistPhrase: string | undefined) {
