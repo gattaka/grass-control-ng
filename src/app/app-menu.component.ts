@@ -13,8 +13,10 @@ import {MusicService} from './music.service';
       <div>
         <a href="/">GrassControl</a>
         <div class="menu-button" (click)="onReindex()">Reindex</div>
+        <div class="menu-button" (click)="onStartVLC()">Start VLC</div>
       </div>
       <div>
+        <div class="menu-button" (click)="onShutdown()">Shutdown</div>
         @if (versionObs | async; as version) {
           <div>Version {{ version }}</div>
         } @else {
@@ -40,6 +42,14 @@ export class AppMenuComponent implements OnInit {
 
   onReindex() {
     this.musicService.reindex();
+  }
+
+  onStartVLC() {
+    this.musicService.startVLC();
+  }
+
+  onShutdown() {
+    this.musicService.shutdown();
   }
 }
 

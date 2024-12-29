@@ -157,4 +157,12 @@ export class MusicService {
   volume(position: number) {
     this.http.get('/api/volume/' + position).subscribe();
   }
+
+  startVLC() {
+    this.http.get('/api/start-vlc').subscribe();
+  }
+
+  shutdown() {
+    this.http.get('/api/shutdown').subscribe();
+  }
 }
