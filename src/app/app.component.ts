@@ -61,6 +61,44 @@ export class AppComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    let self = this;
+
+    document.onkeydown = function (event) {
+      // Na vyhledávácím poli klávesy nechytej
+      if (document.activeElement === document.getElementById("search-input") ||
+        document.activeElement === document.getElementById("search-playlist-input"))
+        return true;
+
+      const keyName = event.key;
+      let consume = true;
+
+      switch (keyName) {
+        case " ":
+        case "MediaPlayPause":
+          self.musicService.pause();
+          break;
+        case "MediaTrackPrevious":
+          self.musicService.previous();
+          break;
+        case "MediaTrackNext":
+          self.musicService.next();
+          break;
+        default:
+          consume = false;
+      }
+
+      if (!consume)
+        return true;
+
+      if (typeof event.stopPropagation != "undefined") {
+        event.stopPropagation();
+      } else {
+        event.cancelBubble = true;
+      }
+      event.preventDefault();
+      return false;
+    };
   }
 
   ngOnDestroy() {
