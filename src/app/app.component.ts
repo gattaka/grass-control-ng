@@ -67,8 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     document.onkeydown = function (event) {
       // Na vyhledávácím poli klávesy nechytej
-      if (document.activeElement === document.getElementById("search-input") ||
-        document.activeElement === document.getElementById("search-playlist-input"))
+      if (document.activeElement && document.activeElement.tagName === "INPUT")
         return true;
 
       const keyName = event.key;
