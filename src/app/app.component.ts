@@ -57,6 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
       status => {
         if (status) {
           this.status = status;
+          document.title = "GrassControl NG :: " + status.currentSong.artist + " - " + status.currentSong.title;
           this.errorMsg = "";
         }
       }
