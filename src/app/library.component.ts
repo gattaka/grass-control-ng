@@ -11,6 +11,9 @@ import {catchError, Observable, of, retry, tap, timer} from 'rxjs';
   template: `
     <form [formGroup]="searchForm" (ngSubmit)="search()">
       <div id="search-div">
+        Nalezeno: {{ items.length }} záznamů
+        <button (click)="enqueAndPlaySearched()" [disabled]="inRoot">⏵</button>
+        <button (click)="enqueSearched()" [disabled]="inRoot">+</button>
         <input id="search-input" autocomplete="do-not-autofill" type="text" formControlName="searchPhrase"/>
         <button type="submit">Vyhledat</button>
       </div>
@@ -66,6 +69,8 @@ export class LibraryComponent implements OnInit {
   // ! = To avoid error, inform the compiler that this variable will never be undefined or null
   itemsObs!: Observable<Item[] | null>;
   libraryUnavailable = false;
+  items: Item[] = [];
+  inRoot = true;
 
   searchForm = new FormGroup({
     searchPhrase: new FormControl('')
@@ -80,8 +85,10 @@ export class LibraryComponent implements OnInit {
 
   private createItemObs(obs: Observable<Item[]>) {
     this.itemsObs = obs.pipe(
-      tap(value => {
+      tap(items => {
         this.libraryUnavailable = false;
+        this.items = items;
+        this.inRoot = items.length == 0 || items[0].path == "";
       }),
       retry({
         delay: (_) => {
@@ -97,7 +104,7 @@ export class LibraryComponent implements OnInit {
 
   search() {
     const value = this.searchForm.value.searchPhrase;
-    this.itemsObs = this.musicService.getItemsBySearch(value);
+    this.createItemObs(this.musicService.getItemsBySearch(value));
   }
 
   openParentDir(item: Item) {
@@ -134,4 +141,11 @@ export class LibraryComponent implements OnInit {
     )).subscribe();
   }
 
+  enqueAndPlaySearched() {
+    this.items.forEach(item => this.enqueAndPlay(item))
+  }
+
+  enqueSearched() {
+    this.items.forEach(item => this.enque(item))
+  }
 }

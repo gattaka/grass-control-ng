@@ -407,10 +407,21 @@ button.selected {
   display: flex;
   margin-bottom: var(--2spacing);
   gap: var(--2spacing);
+  line-height: 27px;
 }
 
 #search-div input {
   flex-grow: 1;
+}
+
+#search-div button {
+  width: 29px;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+#search-div button:last-child {
+  width: initial;
 }
 
 .table-tr-selected {
