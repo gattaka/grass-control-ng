@@ -5,6 +5,7 @@ import {catchError, of, Subscription, switchMap, timer} from 'rxjs';
 import {TimeFormatPipe} from './time-format.pipe';
 import {PlaylistItem} from './playlist-item';
 import {TagDialogComponent} from './tag-dialog.component';
+import {Item} from './item';
 
 @Component({
   selector: 'playlist',
@@ -45,8 +46,8 @@ import {TagDialogComponent} from './tag-dialog.component';
                     </div>
                   </div>
                   <div class="item-div">
-                    <div class="name-div">{{ item.name }}</div>
-                    <div class="dir-info">{{ item.uri }}</div>
+                    <div class="name-div">{{ getFilename(item) }}</div>
+                    <div class="dir-info">{{ getFilepath(item) }}</div>
                   </div>
                 </div>
                 <div class="table-body-td-div playlist-length-div">{{ item.length | timeFormat }}</div>
@@ -96,6 +97,16 @@ export class PlaylistComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  getFilename(item: PlaylistItem) {
+    let lastDelimiter = item.uri.lastIndexOf("\\");
+    return item.uri.substring(lastDelimiter + 1);
+  }
+
+  getFilepath(item: PlaylistItem) {
+    let lastDelimiter = item.uri.lastIndexOf("\\");
+    return item.uri.substring(0, lastDelimiter);
   }
 
   ngOnDestroy() {
