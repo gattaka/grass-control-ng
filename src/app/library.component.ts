@@ -14,7 +14,8 @@ import {catchError, Observable, of, retry, tap, timer} from 'rxjs';
         Nalezeno: {{ items.length }} záznamů
         <button (click)="enqueAndPlaySearched()" [disabled]="inRoot">⏵</button>
         <button (click)="enqueSearched()" [disabled]="inRoot">+</button>
-        <input id="search-input" autocomplete="do-not-autofill" type="text" formControlName="searchPhrase"/>
+        <input id="search-input" autocomplete="do-not-autofill" type="text" formControlName="searchPhrase"
+               (keyup.enter)="search()"/>
         <button type="submit">Vyhledat</button>
       </div>
     </form>
@@ -100,6 +101,9 @@ export class LibraryComponent implements OnInit {
 
   list(path = "") {
     this.createItemObs(this.musicService.getItems(path));
+    let inp = document.getElementById("search-input");
+    if (inp != null)
+      (inp as HTMLInputElement).value = "";
   }
 
   search() {
